@@ -21,7 +21,7 @@ private:
     double m_dbTotalDiskWriteSpeed;
 
 private:
-    void Update();
+    int Update();
 
 private:
     HCOUNTER m_hTotalCPUCounter;
