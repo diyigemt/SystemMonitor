@@ -1,0 +1,8 @@
+/x64/
+/release/
+/Debug/
+/.vs/
+SystemMonitor.pro.user
+SystemMonitor.vcxproj
+SystemMonitor.vcxproj.filters
+SystemMonitor.vcxproj.user
