@@ -1,7 +1,6 @@
 #ifndef MONITOR_H
 #define MONITOR_H
 
-#include <QString>
 #include <Windows.h>
 #include <Pdh.h>
 
@@ -14,16 +13,13 @@ public:
     double GetMemoryUsage();
     double GetDiskReadSpeed();
     double GetDiskWriteSpeed();
+    int Update();
+
 private:
     double m_dbTotalCPUUsage;
     double m_dbTotalMemoryUsage;
     double m_dbTotalDiskReadSpeed;
     double m_dbTotalDiskWriteSpeed;
-
-private:
-    int Update();
-
-private:
     HCOUNTER m_hTotalCPUCounter;
     HCOUNTER m_hTotalMemoryCounter;
     HCOUNTER m_hTotalDiskReadCounter;

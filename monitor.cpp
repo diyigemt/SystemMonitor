@@ -9,15 +9,16 @@
 Monitor::Monitor()
 {
     PDH_STATUS status = PdhOpenQuery(NULL, NULL, &this->m_hQuery);
-    if (status != ERROR_SUCCESS)
-    {
-        MessageBox(NULL, TEXT("初始化查询失败！"), TEXT(""), MB_OK);
-    }
+//    if (status != ERROR_SUCCESS)
+//    {
+//        MessageBox(NULL, TEXT("初始化查询失败!"), TEXT(""), MB_OK);
+//    }
     // 添加各种Counter
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Processor Information(_Total)\\% Processor Utility"), NULL, &this->m_hTotalCPUCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\Working Set - Private"), NULL, &this->m_hTotalMemoryCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Read Bytes/sec"), NULL, &this->m_hTotalDiskReadCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Write Bytes/sec"), NULL, &this->m_hTotalDiskWriteCounter);
+    this->Update(); // 初始化
 }
 
 
@@ -71,9 +72,10 @@ double Monitor::GetDiskWriteSpeed()
     return this->m_dbTotalDiskWriteSpeed;
 }
 
+
 /**
  * @brief Monitor::Update 这是一个私有函数，用来更新Monitor的各种counter的数据，可以作为一个线程定时更新，也可以实时调用。
- * @return int status 返回状态值
+ * @return int 返回更新状态
  */
 int Monitor::Update()
 {
@@ -83,7 +85,7 @@ int Monitor::Update()
     status = PdhCollectQueryData(this->m_hQuery);
     if (ERROR_SUCCESS != status)
     {
-        MessageBox(NULL, TEXT("收集数据失败！"), TEXT(""), MB_OK);
+//        MessageBox(NULL, TEXT("收集数据失败!"), TEXT(""), MB_OK);
         return -1;
     }
 
@@ -91,7 +93,7 @@ int Monitor::Update()
     status = PdhGetFormattedCounterValue(this->m_hTotalCPUCounter, PDH_FMT_DOUBLE, &this->m_dwValue, &this->m_pdhCounterValue);
     if (ERROR_SUCCESS != status)
     {
-        MessageBox(NULL, TEXT("格式化CPU使用率失败！"), TEXT(""), MB_OK);
+//        MessageBox(NULL, TEXT("格式化CPU使用率失败!"), TEXT(""), MB_OK);
         return -1;
     }
     else
@@ -102,7 +104,7 @@ int Monitor::Update()
     status = PdhGetFormattedCounterValue(this->m_hTotalMemoryCounter, PDH_FMT_DOUBLE, &this->m_dwValue, &this->m_pdhCounterValue);
     if (ERROR_SUCCESS != status)
     {
-        MessageBox(NULL, TEXT("格式化内存使用率失败！"), TEXT(""), MB_OK);
+//        MessageBox(NULL, TEXT("格式化内存使用率失败!"), TEXT(""), MB_OK);
         return -1;
     }
     else
@@ -113,7 +115,7 @@ int Monitor::Update()
     status = PdhGetFormattedCounterValue(this->m_hTotalDiskReadCounter, PDH_FMT_DOUBLE, &this->m_dwValue, &this->m_pdhCounterValue);
     if (ERROR_SUCCESS != status)
     {
-        MessageBox(NULL, TEXT("格式化磁盘读取速度失败！"), TEXT(""), MB_OK);
+//        MessageBox(NULL, TEXT("格式化磁盘读取速度失败!"), TEXT(""), MB_OK);
         return -1;
     }
     else
@@ -124,7 +126,7 @@ int Monitor::Update()
     status = PdhGetFormattedCounterValue(this->m_hTotalDiskWriteCounter, PDH_FMT_DOUBLE, &this->m_dwValue, &this->m_pdhCounterValue);
     if (ERROR_SUCCESS != status)
     {
-        MessageBox(NULL, TEXT("格式化磁盘写入速度失败！"), TEXT(""), MB_OK);
+//        MessageBox(NULL, TEXT("格式化磁盘写入速度失败!"), TEXT(""), MB_OK);
         return -1;
     }
     else

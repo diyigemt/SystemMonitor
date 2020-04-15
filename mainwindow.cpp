@@ -21,9 +21,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::update()
 {
+    this->myMonitor->Update(); // 使用之前先更新
     updateCPUUsage();
 }
 void MainWindow::updateCPUUsage()
 {
-    ui->label->setText(myMonitor->getCPUUsage());
+    ui->label->setText(QString("%1").arg(this->myMonitor->GetCPUUsage()));
 }
