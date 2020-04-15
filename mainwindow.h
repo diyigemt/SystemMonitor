@@ -5,7 +5,7 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow;}
 QT_END_NAMESPACE
-class Timer;
+class Monitor;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -13,10 +13,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void onChange(QString s);
-
+public slots:
+    void update();
 private:
+    void updateCPUUsage();
     Ui::MainWindow *ui;
-    Timer *myTimer;
+    Monitor *myMonitor;
+    QTimer *myTimer;
 };
 #endif // MAINWINDOW_H

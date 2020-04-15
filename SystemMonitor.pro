@@ -18,13 +18,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    monitor.cpp \
-    timer.cpp
+    monitor.cpp
 
 HEADERS += \
     mainwindow.h \
-    monitor.h \
-    timer.h
+    monitor.h
 
 FORMS += \
     mainwindow.ui
