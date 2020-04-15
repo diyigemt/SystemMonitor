@@ -7,3 +7,6 @@ SystemMonitor.vcxproj
 SystemMonitor.vcxproj.filters
 SystemMonitor.vcxproj.user
 SystemMonitor.sln
+Makefile
+Makefile.Debug
+Makefile.Release

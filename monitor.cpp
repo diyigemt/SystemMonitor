@@ -81,7 +81,7 @@ int Monitor::Update()
 {
     PDH_STATUS status;
     status = PdhCollectQueryData(this->m_hQuery);
-    Sleep(1000);  // 睡眠一秒钟再次收集一次数据
+//    Sleep(1000);  // 睡眠一秒钟再次收集一次数据 //可能没用?
     status = PdhCollectQueryData(this->m_hQuery);
     if (ERROR_SUCCESS != status)
     {

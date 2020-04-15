@@ -14,18 +14,63 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
+   <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>170</y>
-      <width>301</width>
-      <height>71</height>
+      <x>10</x>
+      <y>10</y>
+      <width>391</width>
+      <height>61</height>
      </rect>
     </property>
-    <property name="text">
-     <string>TextLabel</string>
+    <layout class="QHBoxLayout" name="CPULayout">
+     <item>
+      <widget class="QLabel" name="CUPUsageLabe">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>CPU Usage:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="CPUUsageprogressBar">
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>10</y>
+      <width>194</width>
+      <height>61</height>
+     </rect>
     </property>
+    <layout class="QHBoxLayout" name="ControlLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>开始监控</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopBtn">
+       <property name="text">
+        <string>停止监控</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -41,5 +86,42 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>startMonitor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>472</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stopBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>stopMonitor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>553</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>551</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>startMonitor()</slot>
+  <slot>stopMonitor()</slot>
+ </slots>
 </ui>

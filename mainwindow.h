@@ -14,8 +14,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 public slots:
+    void startMonitor();
+    void stopMonitor();
     void update();
 private:
+    void resetAll();
     void updateCPUUsage();
     Ui::MainWindow *ui;
     Monitor *myMonitor;
