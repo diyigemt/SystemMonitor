@@ -45,5 +45,11 @@ void MainWindow::resetAll()
 
 void MainWindow::updateCPUUsage()
 {
-    ui->CPUUsageprogressBar->setValue(this->myMonitor->GetCPUUsage());
+    int CPUUsage = this->myMonitor->GetCPUUsage();
+    if(CPUUsage == -1)
+    {
+        ui->statusbar->setStatusTip("获取CPU利用率失败!");
+    } else {
+        ui->CPUUsageprogressBar->setValue(CPUUsage);
+    }
 }
