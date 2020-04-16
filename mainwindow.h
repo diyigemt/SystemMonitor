@@ -20,6 +20,8 @@ public slots:
 private:
     void resetAll();
     void updateCPUUsage();
+    void updateMemoryUsage();
+    void updateDiskReadAndWriteSpeed();
     Ui::MainWindow *ui;
     Monitor *myMonitor;
     QTimer *myTimer;

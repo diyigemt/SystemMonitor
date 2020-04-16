@@ -6,10 +6,26 @@ QPushButton{
     text-decoration: none;
     font-size: 20px;
     margin: 0 0;
-    border-radius: 6px;
+    border-radius: 4px;
     height: 40px;
     background-color: white;
 }
 QPushButton:hover{
     background-color: #00b0ff40;
+}
+QLabel{
+    outline: none;
+    border: 1px solid #00b0ff;
+    border-radius: 4px;
+}
+QProgressBar{
+    color: white;
+    background: green;
+    text-align: center;
+    outline: none;
+    border: 2px solid #00b0ff;
+    border-radius: 4px;
+}
+QProgressBar:chunk{
+    background-color: red
 }

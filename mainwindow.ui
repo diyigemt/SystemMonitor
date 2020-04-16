@@ -14,44 +14,12 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>391</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="CPULayout">
-     <item>
-      <widget class="QLabel" name="CUPUsageLabe">
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>CPU Usage:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QProgressBar" name="CPUUsageprogressBar">
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>10</y>
-      <width>194</width>
+      <x>310</x>
+      <y>380</y>
+      <width>195</width>
       <height>61</height>
      </rect>
     </property>
@@ -71,6 +39,313 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>371</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="CPUverticalLayout">
+     <item>
+      <widget class="QLabel" name="CPUTitleLabel">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>CPU Information:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="CPUTypeLabel">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>CPU Type:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="CPUUsageLayout">
+       <item>
+        <widget class="QLabel" name="CUPUsageLabe">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>CPU Usage:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="CPUUsageprogressBar">
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>170</y>
+      <width>371</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="StorageverticalLayout">
+     <item>
+      <widget class="QLabel" name="StorageTitleLabel">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Storage:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="StorageLayout">
+       <item>
+        <widget class="QLabel" name="StorageUsageLabe">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Disk Usage:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="StorageUsageprogressBar">
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="ReadAndWriteLayout">
+       <item>
+        <widget class="QLabel" name="DiskReadLabel">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Read:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="DiskWriteLabel">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Write:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>40</y>
+      <width>381</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="MemoryverticalLayout">
+     <item>
+      <widget class="QLabel" name="MemoryTitleLabel">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Memory Information:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="TotalMemoryLabel">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>System Memory:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="MemoryUsageLayout">
+       <item>
+        <widget class="QLabel" name="MemoryUsageLabe">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Memory Usage:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="MemoryUsageprogressBar">
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>170</y>
+      <width>381</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="PartitionsverticalLayout">
+     <item>
+      <widget class="QLabel" name="PartitionsTitleLabel">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Partitions:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="PartitionsLayout_1">
+       <item>
+        <widget class="QLabel" name="DiskCLabel">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>C:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="DiskDLabel">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>D:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="ReadAndWriteLayout_2">
+       <item>
+        <widget class="QLabel" name="DiskELabel">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>E:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="DiskFLabel">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>F:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>72</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>OS:</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
