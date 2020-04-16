@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     myMonitor = new Monitor();
     myTimer = new QTimer();
     QObject::connect(myTimer, &QTimer::timeout, this, &MainWindow::update);
-    myTimer->start(1000);
+    startMonitor();
 }
 
 MainWindow::~MainWindow()
@@ -28,6 +28,7 @@ void MainWindow::startMonitor()
 void MainWindow::stopMonitor()
 {
     this->myTimer->stop();
+    ui->CPUUsageprogressBar->setValue(0);
 }
 
 void MainWindow::update()

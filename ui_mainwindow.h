@@ -32,7 +32,7 @@ public:
     QProgressBar *CPUUsageprogressBar;
     QWidget *horizontalLayoutWidget_2;
     QHBoxLayout *ControlLayout;
-    QPushButton *pushButton_2;
+    QPushButton *startBtn;
     QPushButton *stopBtn;
     QMenuBar *menubar;
     QStatusBar *statusbar;
@@ -71,10 +71,10 @@ public:
         ControlLayout = new QHBoxLayout(horizontalLayoutWidget_2);
         ControlLayout->setObjectName(QString::fromUtf8("ControlLayout"));
         ControlLayout->setContentsMargins(0, 0, 0, 0);
-        pushButton_2 = new QPushButton(horizontalLayoutWidget_2);
-        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        startBtn = new QPushButton(horizontalLayoutWidget_2);
+        startBtn->setObjectName(QString::fromUtf8("startBtn"));
 
-        ControlLayout->addWidget(pushButton_2);
+        ControlLayout->addWidget(startBtn);
 
         stopBtn = new QPushButton(horizontalLayoutWidget_2);
         stopBtn->setObjectName(QString::fromUtf8("stopBtn"));
@@ -91,7 +91,7 @@ public:
         MainWindow->setStatusBar(statusbar);
 
         retranslateUi(MainWindow);
-        QObject::connect(pushButton_2, SIGNAL(clicked()), MainWindow, SLOT(startMonitor()));
+        QObject::connect(startBtn, SIGNAL(clicked()), MainWindow, SLOT(startMonitor()));
         QObject::connect(stopBtn, SIGNAL(clicked()), MainWindow, SLOT(stopMonitor()));
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -101,7 +101,7 @@ public:
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         CUPUsageLabe->setText(QCoreApplication::translate("MainWindow", "CPU Usage:", nullptr));
-        pushButton_2->setText(QCoreApplication::translate("MainWindow", "\345\274\200\345\247\213\347\233\221\346\216\247", nullptr));
+        startBtn->setText(QCoreApplication::translate("MainWindow", "\345\274\200\345\247\213\347\233\221\346\216\247", nullptr));
         stopBtn->setText(QCoreApplication::translate("MainWindow", "\345\201\234\346\255\242\347\233\221\346\216\247", nullptr));
     } // retranslateUi
 

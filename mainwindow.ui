@@ -57,7 +57,7 @@
     </property>
     <layout class="QHBoxLayout" name="ControlLayout">
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="startBtn">
        <property name="text">
         <string>开始监控</string>
        </property>
@@ -88,7 +88,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>startBtn</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>startMonitor()</slot>
