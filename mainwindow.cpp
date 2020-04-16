@@ -22,6 +22,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::startMonitor()
 {
+    update();
     this->myTimer->start(1000);
 }
 
