@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QDebug>
 #include "monitor.h"
+#include "constants.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -30,21 +31,34 @@ void MainWindow::startMonitor()
 void MainWindow::stopMonitor()
 {
     this->myTimer->stop();
-    ui->CPUUsageprogressBar->setValue(0);
+    resetAll();
 }
 
 void MainWindow::update()
 {
     ui->statusbar->clearMessage(); //删除提示信息
-    if(this->myMonitor->Update() == -1) // 使用之前先更新
+    unsigned int status = this->myMonitor->Update();
+    if(status == GET_DATA_FAILURE)
     {
-        ui->statusbar->showMessage("get data fialed!");
-    } else
-    {
-        updateCPUUsage();
-        updateMemoryUsage();
-        updateDiskReadAndWriteSpeed();
+        ui->statusbar->showMessage("get data failed!");
+        return;
     }
+    if(status == GET_CPUUSAGE_FAILURE)
+    {
+        ui->statusbar->showMessage("get CPU Usage failed!");
+    } else if(status == GET_MEMORY_FAILURE)
+    {
+        ui->statusbar->showMessage("get Memory Usage failed!");
+    } else if(status == GET_DISK_R_FAILURE)
+    {
+        ui->statusbar->showMessage("get disk read speed failed!");
+    } else if(status == GET_DISK_W_FAILURE)
+    {
+        ui->statusbar->showMessage("get disk write speed failed!");
+    }
+    updateCPUUsage();
+    updateMemoryUsage();
+    updateDiskReadAndWriteSpeed();
 }
 
 void MainWindow::resetAll()
@@ -60,7 +74,7 @@ void MainWindow::updateCPUUsage()
     int CPUUsage = this->myMonitor->GetCPUUsage();
     if(CPUUsage == ui->CPUUsageprogressBar->value())
     {
-        ui->statusbar->showMessage("get CPU Usage failed!");
+
     } else {
         ui->CPUUsageprogressBar->setValue(CPUUsage);
     }
@@ -70,12 +84,7 @@ void MainWindow::updateMemoryUsage()
 {
     int memoryUsage = this->myMonitor->GetMemoryUsage();
     qDebug()<<memoryUsage<<endl;
-    if(memoryUsage == ui->MemoryUsageprogressBar->value())
-    {
-        ui->statusbar->showMessage("get Memory Usage failed!");
-    } else {
-        ui->MemoryUsageprogressBar->setValue(memoryUsage);
-    }
+    ui->MemoryUsageprogressBar->setValue(memoryUsage);
 }
 
 void MainWindow::updateDiskReadAndWriteSpeed()
@@ -93,12 +102,7 @@ void MainWindow::updateDiskReadAndWriteSpeed()
     {
         s = "Read: " + QString::number(readSpeed, 'f', 2) + "KB/s";
     }
-    if(s == ui->DiskReadLabel->text())
-    {
-        ui->statusbar->showMessage("get disk read speed failed!");
-    } else {
-        ui->DiskReadLabel->setText(s);
-    }
+    ui->DiskReadLabel->setText(s);
 
     if(writeSpeed > 1024)
     {
@@ -108,10 +112,5 @@ void MainWindow::updateDiskReadAndWriteSpeed()
     {
         s = "Write: " + QString::number(writeSpeed, 'f', 2) + "KB/s";
     }
-    if(s == ui->DiskWriteLabel->text())
-    {
-        ui->statusbar->showMessage("get disk write speed failed!");
-    } else {
-        ui->DiskWriteLabel->setText(s);
-    }
+    ui->DiskWriteLabel->setText(s);
 }
