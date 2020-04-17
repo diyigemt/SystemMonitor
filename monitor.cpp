@@ -41,7 +41,14 @@ Monitor::~Monitor()
  */
 double Monitor::GetMemoryUsage()
 {
-    return this->m_dbTotalMemoryUsage;
+    LPMEMORYSTATUSEX lpBuffer = new MEMORYSTATUSEX;
+    lpBuffer->dwLength = sizeof(MEMORYSTATUSEX);
+    bool t = GlobalMemoryStatusEx(lpBuffer);
+    double memoryTotal = lpBuffer->ullTotalPhys;
+    double memoryAvail = lpBuffer->ullAvailPhys;
+    double memoryUsage = lpBuffer->dwMemoryLoad;
+    return memoryUsage;
+    //return this->m_dbTotalMemoryUsage;
 }
 
 /**
