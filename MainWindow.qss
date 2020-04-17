@@ -19,13 +19,13 @@ QLabel{
     border-radius: 4px;
 }
 QProgressBar{
-    color: white;
-    background: green;
+    color: black;
+    background: white;
     text-align: center;
     outline: none;
     border: 2px solid #00b0ff;
     border-radius: 4px;
 }
 QProgressBar:chunk{
-    background-color: red
+    background-color: #76ff03
 }

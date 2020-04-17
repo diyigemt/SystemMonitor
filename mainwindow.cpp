@@ -65,8 +65,8 @@ void MainWindow::resetAll()
 {
     ui->CPUUsageprogressBar->setValue(0);
     ui->MemoryUsageprogressBar->setValue(0);
-    ui->DiskReadLabel->setText("Read:");
-    ui->DiskWriteLabel->setText("Write:");
+    ui->DiskReadLabel->setText("Read: 0.00KB/s");
+    ui->DiskWriteLabel->setText("Write: 0.00KB/s");
 }
 
 void MainWindow::updateCPUUsage()
