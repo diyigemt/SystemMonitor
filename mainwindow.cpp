@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->statusbar->setStyleSheet("color: rgb(255,0,0)");
     myMonitor = new Monitor();
     myTimer = new QTimer();
     QObject::connect(myTimer, &QTimer::timeout, this, &MainWindow::update);
@@ -34,10 +35,16 @@ void MainWindow::stopMonitor()
 
 void MainWindow::update()
 {
-    this->myMonitor->Update(); // 使用之前先更新
-    updateCPUUsage();
-    updateMemoryUsage();
-    updateDiskReadAndWriteSpeed();
+    ui->statusbar->clearMessage(); //删除提示信息
+    if(this->myMonitor->Update() == -1) // 使用之前先更新
+    {
+        ui->statusbar->showMessage("get data fialed!");
+    } else
+    {
+        updateCPUUsage();
+        updateMemoryUsage();
+        updateDiskReadAndWriteSpeed();
+    }
 }
 
 void MainWindow::resetAll()
@@ -51,9 +58,9 @@ void MainWindow::resetAll()
 void MainWindow::updateCPUUsage()
 {
     int CPUUsage = this->myMonitor->GetCPUUsage();
-    if(CPUUsage == -1)
+    if(CPUUsage == ui->CPUUsageprogressBar->value())
     {
-        ui->statusbar->setStatusTip("获取CPU利用率失败!");
+        ui->statusbar->showMessage("get CPU Usage failed!");
     } else {
         ui->CPUUsageprogressBar->setValue(CPUUsage);
     }
@@ -62,9 +69,10 @@ void MainWindow::updateCPUUsage()
 void MainWindow::updateMemoryUsage()
 {
     int memoryUsage = this->myMonitor->GetMemoryUsage();
-    if(memoryUsage == -1)
+    qDebug()<<memoryUsage<<endl;
+    if(memoryUsage == ui->MemoryUsageprogressBar->value())
     {
-        ui->statusbar->setStatusTip("获取内存占用率失败!");
+        ui->statusbar->showMessage("get Memory Usage failed!");
     } else {
         ui->MemoryUsageprogressBar->setValue(memoryUsage);
     }
@@ -72,18 +80,38 @@ void MainWindow::updateMemoryUsage()
 
 void MainWindow::updateDiskReadAndWriteSpeed()
 {
-    int readSpeed = this->myMonitor->GetDiskReadSpeed();
-    int writeSpeed = this->myMonitor->GetDiskWriteSpeed();
-    if(readSpeed == -1)
+    //bit to KB
+    double readSpeed = this->myMonitor->GetDiskReadSpeed() / 1024;
+    double writeSpeed = this->myMonitor->GetDiskWriteSpeed() / 1024;
+    QString s;
+
+    if(readSpeed > 1024)
     {
-        ui->statusbar->setStatusTip("获取磁盘读取速率失败!");
-    } else {
-        ui->DiskReadLabel->setText("Read:" + QString::number(readSpeed) + "kb/s");
+        readSpeed = readSpeed / 1024;
+        s = "Read: " + QString::number(readSpeed, 'f', 2) + "MB/s";
+    } else
+    {
+        s = "Read: " + QString::number(readSpeed, 'f', 2) + "KB/s";
     }
-    if(writeSpeed == -1)
+    if(s == ui->DiskReadLabel->text())
     {
-        ui->statusbar->setStatusTip("获取磁盘写入速率失败!");
+        ui->statusbar->showMessage("get disk read speed failed!");
     } else {
-        ui->DiskWriteLabel->setText("Write:" + QString::number(writeSpeed) + "kb/s");
+        ui->DiskReadLabel->setText(s);
+    }
+
+    if(writeSpeed > 1024)
+    {
+        writeSpeed = writeSpeed / 1024;
+        s = "Write: " + QString::number(writeSpeed, 'f', 2) + "MB/s";
+    } else
+    {
+        s = "Write: " + QString::number(writeSpeed, 'f', 2) + "KB/s";
+    }
+    if(s == ui->DiskWriteLabel->text())
+    {
+        ui->statusbar->showMessage("get disk write speed failed!");
+    } else {
+        ui->DiskWriteLabel->setText(s);
     }
 }
