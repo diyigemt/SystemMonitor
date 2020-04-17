@@ -1,6 +1,7 @@
 #pragma    comment(lib,"Pdh.lib")
 #include "monitor.h"
 #include <PdhMsg.h>
+#include "constants.h"
 
 
 /**
@@ -8,7 +9,7 @@
  */
 Monitor::Monitor()
 {
-    PDH_STATUS status = PdhOpenQuery(NULL, NULL, &this->m_hQuery);
+    PDH_STATUS status = PdhOpenQuery(nullptr, 0, &this->m_hQuery);
 //    if (status != ERROR_SUCCESS)
 //    {
 //        MessageBox(NULL, TEXT("初始化查询失败!"), TEXT(""), MB_OK);
@@ -79,14 +80,16 @@ double Monitor::GetDiskWriteSpeed()
  */
 int Monitor::Update()
 {
+    int result = 0;
     PDH_STATUS status;
     status = PdhCollectQueryData(this->m_hQuery);
 //    Sleep(1000);  // 睡眠一秒钟再次收集一次数据 //可能没用?
-    status = PdhCollectQueryData(this->m_hQuery);
+//    status = PdhCollectQueryData(this->m_hQuery);
     if (ERROR_SUCCESS != status)
     {
 //        MessageBox(NULL, TEXT("收集数据失败!"), TEXT(""), MB_OK);
-        return -1;
+//        return -1;
+        result |= GET_DATA_FAILURE;
     }
 
     // 格式化数据
@@ -94,7 +97,8 @@ int Monitor::Update()
     if (ERROR_SUCCESS != status)
     {
 //        MessageBox(NULL, TEXT("格式化CPU使用率失败!"), TEXT(""), MB_OK);
-        return -1;
+//        return -1;
+        result |= GET_CPUUSAGE_FAILURE;
     }
     else
     {
@@ -105,7 +109,8 @@ int Monitor::Update()
     if (ERROR_SUCCESS != status)
     {
 //        MessageBox(NULL, TEXT("格式化内存使用率失败!"), TEXT(""), MB_OK);
-        return -1;
+//        return -1;
+        result |= GET_MEMORY_FAILURE;
     }
     else
     {
@@ -116,7 +121,8 @@ int Monitor::Update()
     if (ERROR_SUCCESS != status)
     {
 //        MessageBox(NULL, TEXT("格式化磁盘读取速度失败!"), TEXT(""), MB_OK);
-        return -1;
+//        return -1;
+        result |= GET_DISK_R_FAILURE;
     }
     else
     {
@@ -127,11 +133,12 @@ int Monitor::Update()
     if (ERROR_SUCCESS != status)
     {
 //        MessageBox(NULL, TEXT("格式化磁盘写入速度失败!"), TEXT(""), MB_OK);
-        return -1;
+//        return -1;
+        result |= GET_DISK_W_FAILURE;
     }
     else
     {
         this->m_dbTotalDiskWriteSpeed = this->m_pdhCounterValue.doubleValue;
     }
-    return 0;
+    return result;
 }

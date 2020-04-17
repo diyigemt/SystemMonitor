@@ -21,6 +21,7 @@ SOURCES += \
     monitor.cpp
 
 HEADERS += \
+    constants.h \
     mainwindow.h \
     monitor.h
 

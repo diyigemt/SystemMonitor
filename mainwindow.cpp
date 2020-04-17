@@ -80,7 +80,7 @@ void MainWindow::updateMemoryUsage()
 
 void MainWindow::updateDiskReadAndWriteSpeed()
 {
-    //bit to KB
+    //Byte to KB
     double readSpeed = this->myMonitor->GetDiskReadSpeed() / 1024;
     double writeSpeed = this->myMonitor->GetDiskWriteSpeed() / 1024;
     QString s;
