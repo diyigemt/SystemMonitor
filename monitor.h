@@ -20,6 +20,9 @@ private:
     double m_dbTotalMemoryUsage;
     double m_dbTotalDiskReadSpeed;
     double m_dbTotalDiskWriteSpeed;
+    double m_dbTotalMemoryCapc;
+    double m_dbMemoryAvailbable;
+    LPMEMORYSTATUSEX m_lpBuffer;
     HCOUNTER m_hTotalCPUCounter;
     HCOUNTER m_hTotalMemoryCounter;
     HCOUNTER m_hTotalDiskReadCounter;
