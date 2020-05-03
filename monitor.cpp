@@ -1,8 +1,10 @@
 #pragma    comment(lib,"Pdh.lib")
+#pragma    comment(lib, "user32.lib")
 #include "monitor.h"
 #include <PdhMsg.h>
 #include "constants.h"
 #include <QDebug>
+#include <WinUser.h>
 
 /**
  * @brief Monitor::Monitor 无参构造函数，默认构建四个计数器
@@ -23,6 +25,8 @@ Monitor::Monitor()
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Write Bytes/sec"), NULL, &this->m_hTotalDiskWriteCounter);
     // qDebug() << "Get id:" << endl;
     // this->m_sCPUID = this->QueryCPUID();
+    this->QueryOSVersion(this->m_sOSVersion);
+    qDebug() << this->m_sOSVersion << endl;
     this->Update(); // 初始化
 }
 
@@ -87,6 +91,11 @@ double Monitor::GetDiskWriteSpeed()
 QString Monitor::GetCPUID()
 {
     return this->m_sCPUID;
+}
+
+QString Monitor::GetOSVersion()
+{
+    return this->m_sOSVersion;
 }
 
 /**
@@ -164,7 +173,7 @@ int Monitor::Update()
  * @return QString 通过汇编指令查询到的CPUID
  */
 
-QString Monitor::QueryCPUID()
+int Monitor::QueryCPUID(QString &CPUID)
 {
     // QString sCPUID;
     // QString tmpStr1, tmpStr2;
@@ -202,8 +211,138 @@ QString Monitor::QueryCPUID()
     // tmpStr2.sprintf("%08X%08X", s1, s2);
     // sCPUID = tmpStr1 + tmpStr2;
     // qDebug() << "Vendor Id: " << sVendorID << endl;
-    //int a = GetID();
-    //qDebug() << a << endl;
+    // int a = GetID();
+    // qDebug() << a << endl;
     // return sCPUID;
-    return QString();
+    return 0;
+}
+
+bool Monitor::QueryOSVersion(QString &OSVersion)
+{
+    OSVersion = "";  // 参数置空
+
+    // 使用systeminfo来获取CPU架构
+    SYSTEM_INFO systeminfo;
+    GetSystemInfo(&systeminfo);
+
+    // 使用os获取操作系统的类型和版本
+    OSVERSIONINFOEX os;
+    os.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
+    bool unknown = false;
+    if (GetVersionEx((OSVERSIONINFO *)&os))
+    {
+        // 判断主版本号
+        switch (os.dwMajorVersion)
+        {
+        case 10:
+            // 判断次版本号
+            switch (os.dwMinorVersion)
+            {
+            case 0:
+                if (os.wProductType == VER_NT_WORKSTATION)
+                {
+                    OSVersion += "Windows 10";
+                }
+                else
+                {
+                    OSVersion += "Windows Server 2016";
+                }
+                break;
+            default:
+                unknown = true;
+                break;
+            }
+            break;
+        case 6:
+            switch (os.dwMinorVersion)
+            {
+            case 3:
+                if (os.wProductType == VER_NT_WORKSTATION)
+                {
+                    OSVersion += "Windows 8.1";
+                }
+                else
+                {
+                    OSVersion += "Windows Server 2012 R2";
+                }
+                break;
+            case 2:
+                if (os.wProductType == VER_NT_WORKSTATION)
+                {
+                    OSVersion += "Windows 8";
+                }
+                else
+                {
+                    OSVersion += "Windows Server 2012";
+                }
+                break;
+            case 1:
+                if (os.wProductType == VER_NT_WORKSTATION)
+                {
+                    OSVersion += "Windows 7";
+                }
+                else
+                {
+                    OSVersion += "Windows Server 2008 R2";
+                }
+                break;
+            case 0:
+                if (os.wProductType == VER_NT_WORKSTATION)
+                {
+                    OSVersion += "Windows Vista";
+                }
+                else
+                {
+                    OSVersion += "Windows Server 2008";
+                }
+                break;
+            default:
+                unknown = true;
+                break;
+            }
+            break;
+        case 5:
+            switch (os.dwMinorVersion)
+            {
+            case 2:
+                if (os.wSuiteMask & VER_SUITE_WH_SERVER)
+                {
+                    OSVersion += "Windows Home Server";
+                }
+                else if (GetSystemMetrics(SM_SERVERR2) == 0)
+                {
+                    OSVersion += "Windows Server 2003";
+                }
+                else if((os.wProductType == VER_NT_WORKSTATION) && (systeminfo.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64))
+                {
+                    OSVersion += "Windows XP Professional x64 Edition";
+                }
+                else
+                {
+                    unknown = true;
+                }
+                break;
+            case 1:
+                OSVersion += "Windows XP";
+                break;
+            case 0:
+                OSVersion += "Windows 2000";
+                break;
+            default:
+                unknown = true;
+                break;
+            }
+            break;
+        default:
+            unknown = true;
+            break;
+        }
+    }
+    if (unknown)
+    {
+        OSVersion = "UNKNOWN";
+        return false;
+    }
+    return true;
+
 }

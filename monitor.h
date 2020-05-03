@@ -16,11 +16,13 @@ public:
     double GetDiskReadSpeed();
     double GetDiskWriteSpeed();
     QString GetCPUID();
+    QString GetOSVersion();
     double GetSystemMemory();
     int Update();
 
 private:
-    QString QueryCPUID();
+    int QueryCPUID(QString &CPUID);
+    bool QueryOSVersion(QString &OSVersion);
 
 private:
     double m_dbTotalCPUUsage;
@@ -29,7 +31,8 @@ private:
     double m_dbTotalDiskWriteSpeed;
     double m_dbTotalMemoryCapc;
     double m_dbMemoryAvailbable;
-    QString m_sCPUID;   // 存放CPU的ID
+    QString m_sOSVersion; // 存放操作系统的版本
+    QString m_sCPUID;  // 存放CPU的ID
     LPMEMORYSTATUSEX m_lpBuffer;
     HCOUNTER m_hTotalCPUCounter;
 //    HCOUNTER m_hTotalMemoryCounter;
