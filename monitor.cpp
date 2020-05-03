@@ -2,6 +2,7 @@
 #include "monitor.h"
 #include <PdhMsg.h>
 #include "constants.h"
+#include <QDebug>
 
 
 /**
@@ -10,6 +11,8 @@
 Monitor::Monitor()
 {
     PDH_STATUS status = PdhOpenQuery(nullptr, 0, &this->m_hQuery);
+    this->m_lpBuffer = new MEMORYSTATUSEX;
+    this->m_lpBuffer->dwLength = sizeof (MEMORYSTATUSEX);
 //    if (status != ERROR_SUCCESS)
 //    {
 //        MessageBox(NULL, TEXT("初始化查询失败!"), TEXT(""), MB_OK);
@@ -33,6 +36,7 @@ Monitor::~Monitor()
    PdhRemoveCounter(this->m_hTotalDiskReadCounter);
    PdhRemoveCounter(this->m_hTotalDiskWriteCounter);
    PdhCloseQuery(this->m_hQuery);
+   delete this->m_lpBuffer;
 }
 
 /**
@@ -41,14 +45,8 @@ Monitor::~Monitor()
  */
 double Monitor::GetMemoryUsage()
 {
-    LPMEMORYSTATUSEX lpBuffer = new MEMORYSTATUSEX;
-    lpBuffer->dwLength = sizeof(MEMORYSTATUSEX);
-    bool t = GlobalMemoryStatusEx(lpBuffer);
-    double memoryTotal = lpBuffer->ullTotalPhys;
-    double memoryAvail = lpBuffer->ullAvailPhys;
-    double memoryUsage = lpBuffer->dwMemoryLoad;
-    return memoryUsage;
-    //return this->m_dbTotalMemoryUsage;
+
+    return this->m_dbTotalMemoryUsage;
 }
 
 /**
@@ -90,12 +88,10 @@ int Monitor::Update()
     int result = 0;
     PDH_STATUS status;
     status = PdhCollectQueryData(this->m_hQuery);
-//    Sleep(1000);  // 睡眠一秒钟再次收集一次数据 //可能没用?
+//    Sleep(1000);  // 睡眠一秒钟再次收集一次数据
 //    status = PdhCollectQueryData(this->m_hQuery);
     if (ERROR_SUCCESS != status)
     {
-//        MessageBox(NULL, TEXT("收集数据失败!"), TEXT(""), MB_OK);
-//        return -1;
         result |= GET_DATA_FAILURE;
     }
 
@@ -103,8 +99,6 @@ int Monitor::Update()
     status = PdhGetFormattedCounterValue(this->m_hTotalCPUCounter, PDH_FMT_DOUBLE, &this->m_dwValue, &this->m_pdhCounterValue);
     if (ERROR_SUCCESS != status)
     {
-//        MessageBox(NULL, TEXT("格式化CPU使用率失败!"), TEXT(""), MB_OK);
-//        return -1;
         result |= GET_CPUUSAGE_FAILURE;
     }
     else
@@ -112,23 +106,21 @@ int Monitor::Update()
         this->m_dbTotalCPUUsage = this->m_pdhCounterValue.doubleValue;
     }
 
-    status = PdhGetFormattedCounterValue(this->m_hTotalMemoryCounter, PDH_FMT_DOUBLE, &this->m_dwValue, &this->m_pdhCounterValue);
-    if (ERROR_SUCCESS != status)
+    bool retVal = GlobalMemoryStatusEx(this->m_lpBuffer);
+    if (retVal == false)
     {
-//        MessageBox(NULL, TEXT("格式化内存使用率失败!"), TEXT(""), MB_OK);
-//        return -1;
         result |= GET_MEMORY_FAILURE;
     }
     else
     {
-        this->m_dbTotalMemoryUsage = this->m_pdhCounterValue.doubleValue;
+        this->m_dbTotalMemoryCapc = this->m_lpBuffer->ullTotalPhys;
+        this->m_dbMemoryAvailbable = this->m_lpBuffer->ullAvailPhys;
+        this->m_dbTotalMemoryUsage = this->m_lpBuffer->dwMemoryLoad;
     }
 
     status = PdhGetFormattedCounterValue(this->m_hTotalDiskReadCounter, PDH_FMT_DOUBLE, &this->m_dwValue, &this->m_pdhCounterValue);
     if (ERROR_SUCCESS != status)
     {
-//        MessageBox(NULL, TEXT("格式化磁盘读取速度失败!"), TEXT(""), MB_OK);
-//        return -1;
         result |= GET_DISK_R_FAILURE;
     }
     else
@@ -139,8 +131,6 @@ int Monitor::Update()
     status = PdhGetFormattedCounterValue(this->m_hTotalDiskWriteCounter, PDH_FMT_DOUBLE, &this->m_dwValue, &this->m_pdhCounterValue);
     if (ERROR_SUCCESS != status)
     {
-//        MessageBox(NULL, TEXT("格式化磁盘写入速度失败!"), TEXT(""), MB_OK);
-//        return -1;
         result |= GET_DISK_W_FAILURE;
     }
     else
