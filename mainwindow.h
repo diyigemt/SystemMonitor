@@ -25,11 +25,12 @@ private:
     void updateCPUUsage();
     void updateMemoryUsage();
     void updateDiskReadAndWriteSpeed();
-    void addDisk();
+    void addDisk(QString id);
     Ui::MainWindow *ui;
     Monitor *myMonitor;
     QTimer *myTimer;
     QMap<QString, QWidget*> *myMap;
+    int diskCount;
 
 };
 #endif // MAINWINDOW_H

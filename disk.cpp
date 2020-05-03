@@ -10,8 +10,10 @@ Disk::Disk()
 
 Disk::Disk(QString id)
 {
-    Disk();
-    setDiskId(id);
+    diskId = new QLabel(id);
+    labelMap = new QMap<QString, diskLabelInfo*>();
+    this->addWidget((QWidget*)diskId, 0, 0, 1, 3);
+    this->diskCount = 0;
 }
 
 Disk::~Disk()

@@ -16,9 +16,10 @@ MainWindow::MainWindow(QWidget *parent)
     myMonitor = new Monitor();
     myTimer = new QTimer();
     myMap = new QMap<QString, QWidget*>();
+    diskCount = 0;
     QObject::connect(myTimer, &QTimer::timeout, this, &MainWindow::update);
     startMonitor();
-    addDisk();
+    addDisk("123123123");
 }
 
 MainWindow::~MainWindow()
@@ -119,13 +120,12 @@ void MainWindow::updateDiskReadAndWriteSpeed()
     ui->DiskWriteLabel->setText(s);
 }
 
-void MainWindow::addDisk()
+void MainWindow::addDisk(QString id)
 {
-    Disk* a = new Disk();
-    a->setDiskId("1231213142343452");
-    a->addPartition("C:", 100.1f, 200.2f);
-    a->setPartition("C:", 50.2f, 100.0f);
-    QLabel* s = new QLabel("1231312");
-    ui->DiskLayout->addLayout(a, 0, 0);
-    ui->DiskLayout->addWidget((QWidget*)s, 1, 1);
+    Disk* disk = new Disk(id);
+    disk->addPartition("C:", 100.1f, 200.2f);
+    int row = diskCount / 2;
+    int column = diskCount - row;
+    ui->DiskLayout->addLayout(disk, row, column, 1, 1);
+    diskCount++;
 }

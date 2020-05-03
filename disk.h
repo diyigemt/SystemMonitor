@@ -14,6 +14,7 @@ class Disk : public QGridLayout
     Q_OBJECT
 public:
     Disk();
+    Disk(QString id);
     ~Disk();
     void setDiskId(QString id);
     void addPartition(QString name, float usage, float total);
