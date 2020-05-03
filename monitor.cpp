@@ -78,6 +78,14 @@ double Monitor::GetDiskWriteSpeed()
     return this->m_dbTotalDiskWriteSpeed;
 }
 
+/**
+ * @brief Monitor::GetSystemMemory 这是一个公有函数，用来获取内存总量信息。
+ * @return double 返回内存总量
+ */
+double Monitor::GetSystemMemory()
+{
+    return this->m_dbTotalMemoryCapc;
+}
 
 /**
  * @brief Monitor::Update 这是一个私有函数，用来更新Monitor的各种counter的数据，可以作为一个线程定时更新，也可以实时调用。

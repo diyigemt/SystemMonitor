@@ -64,6 +64,7 @@ void MainWindow::update()
     updateCPUUsage();
     updateMemoryUsage();
     updateDiskReadAndWriteSpeed();
+    updateSystemMemory();
 }
 
 void MainWindow::resetAll()
@@ -92,6 +93,11 @@ void MainWindow::updateMemoryUsage()
     ui->MemoryUsageprogressBar->setValue(memoryUsage);
 }
 
+void MainWindow::updateSystemMemory()
+{
+    int SystemMemory = (int)(this->myMonitor->GetSystemMemory()/1024/1024);
+    ui->TotalMemoryLabel->setText("System Memory:" + QString::number(SystemMemory));
+}
 void MainWindow::updateDiskReadAndWriteSpeed()
 {
     //Byte to KB

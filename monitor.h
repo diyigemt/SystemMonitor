@@ -13,6 +13,7 @@ public:
     double GetMemoryUsage();
     double GetDiskReadSpeed();
     double GetDiskWriteSpeed();
+    double GetSystemMemory();
     int Update();
 
 private:

@@ -24,6 +24,7 @@ private:
     void resetAll();
     void updateCPUUsage();
     void updateMemoryUsage();
+    void updateSystemMemory();
     void updateDiskReadAndWriteSpeed();
     void addDisk(QString id);
     Ui::MainWindow *ui;
