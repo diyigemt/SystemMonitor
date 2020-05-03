@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <WinUser.h>
 
+// 这两个结构体不用管，这是查询信息用的
 typedef struct _PEB {
     BOOLEAN InheritedAddressSpace;
     BOOLEAN ReadImageFileExecOptions;
