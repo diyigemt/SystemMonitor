@@ -4,7 +4,6 @@
 #include "constants.h"
 #include <QDebug>
 
-
 /**
  * @brief Monitor::Monitor 无参构造函数，默认构建四个计数器
  */
@@ -19,9 +18,11 @@ Monitor::Monitor()
 //    }
     // 添加各种Counter
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Processor Information(_Total)\\% Processor Utility"), NULL, &this->m_hTotalCPUCounter);
-    status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\Working Set - Private"), NULL, &this->m_hTotalMemoryCounter);
+//    status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\Working Set - Private"), NULL, &this->m_hTotalMemoryCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Read Bytes/sec"), NULL, &this->m_hTotalDiskReadCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Write Bytes/sec"), NULL, &this->m_hTotalDiskWriteCounter);
+    qDebug() << "Get id:" << endl;
+    this->m_sCPUID = this->QueryCPUID();
     this->Update(); // 初始化
 }
 
@@ -32,7 +33,7 @@ Monitor::Monitor()
 Monitor::~Monitor()
 {
    PdhRemoveCounter(this->m_hTotalCPUCounter);
-   PdhRemoveCounter(this->m_hTotalMemoryCounter);
+//   PdhRemoveCounter(this->m_hTotalMemoryCounter);
    PdhRemoveCounter(this->m_hTotalDiskReadCounter);
    PdhRemoveCounter(this->m_hTotalDiskWriteCounter);
    PdhCloseQuery(this->m_hQuery);
@@ -76,6 +77,16 @@ double Monitor::GetDiskReadSpeed()
 double Monitor::GetDiskWriteSpeed()
 {
     return this->m_dbTotalDiskWriteSpeed;
+}
+
+/**
+ * @brief Monitor::GetCPUID
+ * @return QString 本机的CPUID字符串
+ */
+
+QString Monitor::GetCPUID()
+{
+    return this->m_sCPUID;
 }
 
 
@@ -138,4 +149,52 @@ int Monitor::Update()
         this->m_dbTotalDiskWriteSpeed = this->m_pdhCounterValue.doubleValue;
     }
     return result;
+}
+
+/**
+ * @brief Monitor::QueryCPUID
+ * @return QString 通过汇编指令查询到的CPUID
+ */
+
+QString Monitor::QueryCPUID()
+{
+    QString sCPUID;
+    QString tmpStr1, tmpStr2;
+    QString sVendorID;
+
+    // unsigned char vendor_id[]="------------";
+
+    // unsigned long s1, s2;
+
+    // // 查询CPUID
+    // __asm {
+    //     xor eax, eax
+    //     cpuid
+    //     mov dword ptr vendor_id, ebx
+    //     mov dword ptr vendor_id[4], edx
+    //     mov dword ptr vendor_id[8], ecx
+    // }
+    // sVendorID.sprintf("%s-", vendor_id);
+    // __asm {
+    //     mov eax, 01h
+    //     xor edx, edx
+    //     cpuid
+    //     mov s1, edx
+    //     mov s2, eax
+    // }
+    // tmpStr1.sprintf("%08X%08X", s1, s2);
+    // __asm {
+    //     mov eax, 03h
+    //     xor ecx, ecx
+    //     xor edx, edx
+    //     cpuid
+    //     mov s1, edx
+    //     mov s2, ecx
+    // }
+    // tmpStr2.sprintf("%08X%08X", s1, s2);
+    // sCPUID = tmpStr1 + tmpStr2;
+    // qDebug() << "Vendor Id: " << sVendorID << endl;
+    //int a = GetID();
+    //qDebug() << a << endl;
+    return sCPUID;
 }
