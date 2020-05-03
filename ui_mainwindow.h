@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
@@ -41,9 +42,6 @@ public:
     QWidget *verticalLayoutWidget_2;
     QVBoxLayout *StorageverticalLayout;
     QLabel *StorageTitleLabel;
-    QHBoxLayout *StorageLayout;
-    QLabel *StorageUsageLabe;
-    QProgressBar *StorageUsageprogressBar;
     QHBoxLayout *ReadAndWriteLayout;
     QLabel *DiskReadLabel;
     QLabel *DiskWriteLabel;
@@ -54,16 +52,9 @@ public:
     QHBoxLayout *MemoryUsageLayout;
     QLabel *MemoryUsageLabe;
     QProgressBar *MemoryUsageprogressBar;
-    QWidget *verticalLayoutWidget_4;
-    QVBoxLayout *PartitionsverticalLayout;
-    QLabel *PartitionsTitleLabel;
-    QHBoxLayout *PartitionsLayout_1;
-    QLabel *DiskCLabel;
-    QLabel *DiskDLabel;
-    QHBoxLayout *ReadAndWriteLayout_2;
-    QLabel *DiskELabel;
-    QLabel *DiskFLabel;
     QLabel *label;
+    QWidget *gridLayoutWidget_3;
+    QGridLayout *DiskLayout;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -76,7 +67,7 @@ public:
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         horizontalLayoutWidget_2 = new QWidget(centralwidget);
         horizontalLayoutWidget_2->setObjectName(QString::fromUtf8("horizontalLayoutWidget_2"));
-        horizontalLayoutWidget_2->setGeometry(QRect(310, 380, 195, 61));
+        horizontalLayoutWidget_2->setGeometry(QRect(600, 480, 195, 61));
         ControlLayout = new QHBoxLayout(horizontalLayoutWidget_2);
         ControlLayout->setObjectName(QString::fromUtf8("ControlLayout"));
         ControlLayout->setContentsMargins(0, 0, 0, 0);
@@ -130,7 +121,7 @@ public:
 
         verticalLayoutWidget_2 = new QWidget(centralwidget);
         verticalLayoutWidget_2->setObjectName(QString::fromUtf8("verticalLayoutWidget_2"));
-        verticalLayoutWidget_2->setGeometry(QRect(10, 170, 371, 131));
+        verticalLayoutWidget_2->setGeometry(QRect(10, 170, 781, 81));
         StorageverticalLayout = new QVBoxLayout(verticalLayoutWidget_2);
         StorageverticalLayout->setObjectName(QString::fromUtf8("StorageverticalLayout"));
         StorageverticalLayout->setContentsMargins(0, 0, 0, 0);
@@ -139,23 +130,6 @@ public:
         StorageTitleLabel->setFont(font);
 
         StorageverticalLayout->addWidget(StorageTitleLabel);
-
-        StorageLayout = new QHBoxLayout();
-        StorageLayout->setObjectName(QString::fromUtf8("StorageLayout"));
-        StorageUsageLabe = new QLabel(verticalLayoutWidget_2);
-        StorageUsageLabe->setObjectName(QString::fromUtf8("StorageUsageLabe"));
-        StorageUsageLabe->setFont(font);
-
-        StorageLayout->addWidget(StorageUsageLabe);
-
-        StorageUsageprogressBar = new QProgressBar(verticalLayoutWidget_2);
-        StorageUsageprogressBar->setObjectName(QString::fromUtf8("StorageUsageprogressBar"));
-        StorageUsageprogressBar->setValue(0);
-
-        StorageLayout->addWidget(StorageUsageprogressBar);
-
-
-        StorageverticalLayout->addLayout(StorageLayout);
 
         ReadAndWriteLayout = new QHBoxLayout();
         ReadAndWriteLayout->setObjectName(QString::fromUtf8("ReadAndWriteLayout"));
@@ -209,56 +183,16 @@ public:
 
         MemoryverticalLayout->addLayout(MemoryUsageLayout);
 
-        verticalLayoutWidget_4 = new QWidget(centralwidget);
-        verticalLayoutWidget_4->setObjectName(QString::fromUtf8("verticalLayoutWidget_4"));
-        verticalLayoutWidget_4->setGeometry(QRect(410, 170, 381, 131));
-        PartitionsverticalLayout = new QVBoxLayout(verticalLayoutWidget_4);
-        PartitionsverticalLayout->setObjectName(QString::fromUtf8("PartitionsverticalLayout"));
-        PartitionsverticalLayout->setContentsMargins(0, 0, 0, 0);
-        PartitionsTitleLabel = new QLabel(verticalLayoutWidget_4);
-        PartitionsTitleLabel->setObjectName(QString::fromUtf8("PartitionsTitleLabel"));
-        PartitionsTitleLabel->setFont(font);
-
-        PartitionsverticalLayout->addWidget(PartitionsTitleLabel);
-
-        PartitionsLayout_1 = new QHBoxLayout();
-        PartitionsLayout_1->setObjectName(QString::fromUtf8("PartitionsLayout_1"));
-        DiskCLabel = new QLabel(verticalLayoutWidget_4);
-        DiskCLabel->setObjectName(QString::fromUtf8("DiskCLabel"));
-        DiskCLabel->setFont(font);
-
-        PartitionsLayout_1->addWidget(DiskCLabel);
-
-        DiskDLabel = new QLabel(verticalLayoutWidget_4);
-        DiskDLabel->setObjectName(QString::fromUtf8("DiskDLabel"));
-        DiskDLabel->setFont(font);
-
-        PartitionsLayout_1->addWidget(DiskDLabel);
-
-
-        PartitionsverticalLayout->addLayout(PartitionsLayout_1);
-
-        ReadAndWriteLayout_2 = new QHBoxLayout();
-        ReadAndWriteLayout_2->setObjectName(QString::fromUtf8("ReadAndWriteLayout_2"));
-        DiskELabel = new QLabel(verticalLayoutWidget_4);
-        DiskELabel->setObjectName(QString::fromUtf8("DiskELabel"));
-        DiskELabel->setFont(font);
-
-        ReadAndWriteLayout_2->addWidget(DiskELabel);
-
-        DiskFLabel = new QLabel(verticalLayoutWidget_4);
-        DiskFLabel->setObjectName(QString::fromUtf8("DiskFLabel"));
-        DiskFLabel->setFont(font);
-
-        ReadAndWriteLayout_2->addWidget(DiskFLabel);
-
-
-        PartitionsverticalLayout->addLayout(ReadAndWriteLayout_2);
-
         label = new QLabel(centralwidget);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(10, 10, 72, 15));
         label->setFont(font);
+        gridLayoutWidget_3 = new QWidget(centralwidget);
+        gridLayoutWidget_3->setObjectName(QString::fromUtf8("gridLayoutWidget_3"));
+        gridLayoutWidget_3->setGeometry(QRect(10, 260, 781, 211));
+        DiskLayout = new QGridLayout(gridLayoutWidget_3);
+        DiskLayout->setObjectName(QString::fromUtf8("DiskLayout"));
+        DiskLayout->setContentsMargins(0, 0, 0, 0);
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -284,17 +218,11 @@ public:
         CPUTypeLabel->setText(QCoreApplication::translate("MainWindow", "CPU Type:", nullptr));
         CUPUsageLabe->setText(QCoreApplication::translate("MainWindow", "CPU Usage:", nullptr));
         StorageTitleLabel->setText(QCoreApplication::translate("MainWindow", "Storage:", nullptr));
-        StorageUsageLabe->setText(QCoreApplication::translate("MainWindow", "Disk Usage:", nullptr));
         DiskReadLabel->setText(QCoreApplication::translate("MainWindow", "Read:", nullptr));
         DiskWriteLabel->setText(QCoreApplication::translate("MainWindow", "Write:", nullptr));
         MemoryTitleLabel->setText(QCoreApplication::translate("MainWindow", "Memory Information:", nullptr));
         TotalMemoryLabel->setText(QCoreApplication::translate("MainWindow", "System Memory:", nullptr));
         MemoryUsageLabe->setText(QCoreApplication::translate("MainWindow", "Memory Usage:", nullptr));
-        PartitionsTitleLabel->setText(QCoreApplication::translate("MainWindow", "Partitions:", nullptr));
-        DiskCLabel->setText(QCoreApplication::translate("MainWindow", "C:", nullptr));
-        DiskDLabel->setText(QCoreApplication::translate("MainWindow", "D:", nullptr));
-        DiskELabel->setText(QCoreApplication::translate("MainWindow", "E:", nullptr));
-        DiskFLabel->setText(QCoreApplication::translate("MainWindow", "F:", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "OS:", nullptr));
     } // retranslateUi
 

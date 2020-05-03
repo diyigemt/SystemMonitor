@@ -16,6 +16,7 @@ public:
     double GetDiskReadSpeed();
     double GetDiskWriteSpeed();
     QString GetCPUID();
+    double GetSystemMemory();
     int Update();
 
 private:

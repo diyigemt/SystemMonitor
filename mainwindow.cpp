@@ -3,6 +3,8 @@
 
 #include <QTimer>
 #include <QDebug>
+#include <QWidget>
+#include <QMap>
 #include "monitor.h"
 #include "constants.h"
 MainWindow::MainWindow(QWidget *parent)
@@ -13,8 +15,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusbar->setStyleSheet("color: rgb(255,0,0)");
     myMonitor = new Monitor();
     myTimer = new QTimer();
+    myMap = new QMap<QString, QWidget*>();
+    diskCount = 0;
     QObject::connect(myTimer, &QTimer::timeout, this, &MainWindow::update);
     startMonitor();
+    addDisk("123123123");
 }
 
 MainWindow::~MainWindow()
@@ -59,6 +64,7 @@ void MainWindow::update()
     updateCPUUsage();
     updateMemoryUsage();
     updateDiskReadAndWriteSpeed();
+    updateSystemMemory();
 }
 
 void MainWindow::resetAll()
@@ -87,6 +93,11 @@ void MainWindow::updateMemoryUsage()
     ui->MemoryUsageprogressBar->setValue(memoryUsage);
 }
 
+void MainWindow::updateSystemMemory()
+{
+    int SystemMemory = (int)(this->myMonitor->GetSystemMemory()/1024/1024);
+    ui->TotalMemoryLabel->setText("System Memory:" + QString::number(SystemMemory));
+}
 void MainWindow::updateDiskReadAndWriteSpeed()
 {
     //Byte to KB
@@ -113,4 +124,14 @@ void MainWindow::updateDiskReadAndWriteSpeed()
         s = "Write: " + QString::number(writeSpeed, 'f', 2) + "KB/s";
     }
     ui->DiskWriteLabel->setText(s);
+}
+
+void MainWindow::addDisk(QString id)
+{
+    Disk* disk = new Disk(id);
+    disk->addPartition("C:", 100.1f, 200.2f);
+    int row = diskCount / 2;
+    int column = diskCount - row;
+    ui->DiskLayout->addLayout(disk, row, column, 1, 1);
+    diskCount++;
 }

@@ -21,8 +21,8 @@ Monitor::Monitor()
 //    status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\Working Set - Private"), NULL, &this->m_hTotalMemoryCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Read Bytes/sec"), NULL, &this->m_hTotalDiskReadCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Write Bytes/sec"), NULL, &this->m_hTotalDiskWriteCounter);
-    qDebug() << "Get id:" << endl;
-    this->m_sCPUID = this->QueryCPUID();
+    // qDebug() << "Get id:" << endl;
+    // this->m_sCPUID = this->QueryCPUID();
     this->Update(); // 初始化
 }
 
@@ -89,6 +89,14 @@ QString Monitor::GetCPUID()
     return this->m_sCPUID;
 }
 
+/**
+ * @brief Monitor::GetSystemMemory 这是一个公有函数，用来获取内存总量信息。
+ * @return double 返回内存总量
+ */
+double Monitor::GetSystemMemory()
+{
+    return this->m_dbTotalMemoryCapc;
+}
 
 /**
  * @brief Monitor::Update 这是一个私有函数，用来更新Monitor的各种counter的数据，可以作为一个线程定时更新，也可以实时调用。
@@ -158,9 +166,9 @@ int Monitor::Update()
 
 QString Monitor::QueryCPUID()
 {
-    QString sCPUID;
-    QString tmpStr1, tmpStr2;
-    QString sVendorID;
+    // QString sCPUID;
+    // QString tmpStr1, tmpStr2;
+    // QString sVendorID;
 
     // unsigned char vendor_id[]="------------";
 
@@ -196,5 +204,6 @@ QString Monitor::QueryCPUID()
     // qDebug() << "Vendor Id: " << sVendorID << endl;
     //int a = GetID();
     //qDebug() << a << endl;
-    return sCPUID;
+    // return sCPUID;
+    return QString();
 }
