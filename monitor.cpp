@@ -5,6 +5,7 @@
 #include "constants.h"
 #include <QDebug>
 #include <WinUser.h>
+// #include <VersionHelpers.h>
 
 /**
  * @brief Monitor::Monitor 无参构造函数，默认构建四个计数器
@@ -343,6 +344,8 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
         OSVersion = "UNKNOWN";
         return false;
     }
+    // bool version = IsWindows8OrGreater();
+    // qDebug() << version << endl;
     return true;
 
 }
