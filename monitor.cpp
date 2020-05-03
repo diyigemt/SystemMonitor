@@ -6,6 +6,26 @@
 #include <QDebug>
 #include <WinUser.h>
 
+//wmic相关定义
+#define _WIN32_DCOM
+#include <comdef.h>
+#include <Wbemidl.h>
+
+#pragma comment(lib, "wbemuuid.lib")
+#define k2g 1073741824 //byte to gb
+
+IWbemLocator* pLoc = NULL;
+IWbemServices* pSvc = NULL;
+
+//wmic连接函数声明
+bool wmi_run();
+bool wmi_close();
+
+//宽字符转浮点数函数声明
+float w2f(const wchar_t* pwstr);
+//宽字符转QSTRING函数声明
+QString w2s(const wchar_t* pwstr);
+
 // 这两个结构体不用管，这是查询信息用的
 typedef struct _PEB {
     BOOLEAN InheritedAddressSpace;
@@ -84,6 +104,8 @@ Monitor::Monitor()
     // 获取系统的版本
     this->QueryOSVersion(this->m_sOSVersion);
     qDebug() << this->m_sOSVersion << endl;
+    //获取硬盘信息
+    this->SetDiskInf(this->diskList);
     this->Update(); // 初始化
 }
 
@@ -219,56 +241,65 @@ int Monitor::Update()
     {
         this->m_dbTotalDiskWriteSpeed = this->m_pdhCounterValue.doubleValue;
     }
+
+    //更新硬盘信息
+    //清楚全部数据重新读取
+    UpdateDiskInf(diskList);
+
     return result;
 }
 
 /**
  * @brief Monitor::QueryCPUID
- * @return QString 通过汇编指令查询到的CPUID
+ * @return QString 通过wmci指令查询到的CPUID
  */
-
-int Monitor::QueryCPUID(QString &CPUID)
+bool Monitor::QueryCPUID(QString &CPUID)
 {
-    // QString sCPUID;
-    // QString tmpStr1, tmpStr2;
-    // QString sVendorID;
+    HRESULT hres;
+    IEnumWbemClassObject* pEnumerator = NULL;
 
-    // unsigned char vendor_id[]="------------";
+    hres = pSvc->ExecQuery(
+        bstr_t("WQL"),
+        bstr_t("SELECT * FROM Win32_Processor"),
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
+        NULL,
+        &pEnumerator);
 
-    // unsigned long s1, s2;
+    if (FAILED(hres)) {
+        qDebug()<< "Query for processes failed. "
+            << "Error code = 0x"
+            << hex << hres << endl;
+        pSvc->Release();
+        pLoc->Release();
+        CoUninitialize();
+        return FALSE;
+    }
+    else {
+        IWbemClassObject* pclsObj;
+        ULONG uReturn = 0;
+        while (pEnumerator) {
+            hres = pEnumerator->Next(WBEM_INFINITE, 1,
+                &pclsObj, &uReturn);
+            if (0 == uReturn) break;
 
-    // // 查询CPUID
-    // __asm {
-    //     xor eax, eax
-    //     cpuid
-    //     mov dword ptr vendor_id, ebx
-    //     mov dword ptr vendor_id[4], edx
-    //     mov dword ptr vendor_id[8], ecx
-    // }
-    // sVendorID.sprintf("%s-", vendor_id);
-    // __asm {
-    //     mov eax, 01h
-    //     xor edx, edx
-    //     cpuid
-    //     mov s1, edx
-    //     mov s2, eax
-    // }
-    // tmpStr1.sprintf("%08X%08X", s1, s2);
-    // __asm {
-    //     mov eax, 03h
-    //     xor ecx, ecx
-    //     xor edx, edx
-    //     cpuid
-    //     mov s1, edx
-    //     mov s2, ecx
-    // }
-    // tmpStr2.sprintf("%08X%08X", s1, s2);
-    // sCPUID = tmpStr1 + tmpStr2;
-    // qDebug() << "Vendor Id: " << sVendorID << endl;
-    // int a = GetID();
-    // qDebug() << a << endl;
-    // return sCPUID;
-    return 0;
+            VARIANT vtProp3;
+            hres = pclsObj->Get(_bstr_t(L"DeviceID"), 0, &vtProp3, 0, 0);
+
+            std::wstring tmp = vtProp3.bstrVal;
+            tmp = tmp.substr(4);
+
+            VARIANT vtProp3_id;
+            pclsObj->Get(L"ProcessorId", 0, &vtProp3_id, 0, 0);
+
+            if (!(vtProp3.vt == VT_EMPTY || vtProp3.vt == VT_I4 ||
+                vtProp3.vt == VT_DISPATCH))
+            {
+                CPUID = w2s(vtProp3_id.bstrVal);
+            }
+        }
+    }
+    pEnumerator->Release();
+    return TRUE;
 }
 
 bool Monitor::QueryOSVersion(QString &OSVersion)
@@ -409,4 +440,282 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
         return false;
     }
     return true;
+}
+
+/**
+ * @brief Monitor::SetDiskInf
+ * @return QString 通过wmci指令添加硬盘和分区信息
+ */
+bool Monitor::SetDiskInf(QList<Disk> &diskList)
+{
+    wmi_run();
+
+    HRESULT hres;
+    IEnumWbemClassObject* pEnumerator = NULL;
+
+    hres = pSvc->ExecQuery(
+        bstr_t("WQL"),
+        bstr_t("SELECT * FROM Win32_DiskDrive"),
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
+        NULL,
+        &pEnumerator);
+
+    if (FAILED(hres)) {
+        qDebug()<< "Query for processes failed. "
+            << "Error code = 0x"
+            << hex << hres << endl;
+        pSvc->Release();
+        pLoc->Release();
+        CoUninitialize();
+        return FALSE;
+    }
+    else {
+        IWbemClassObject* pclsObj;
+        ULONG uReturn = 0;
+        while (pEnumerator) {
+            hres = pEnumerator->Next(WBEM_INFINITE, 1,
+                &pclsObj, &uReturn);
+            if (0 == uReturn) break;
+
+            VARIANT vtProp;
+            hres = pclsObj->Get(_bstr_t(L"DeviceID"), 0, &vtProp, 0, 0);
+
+            std::wstring tmp = vtProp.bstrVal;
+            tmp = tmp.substr(4);
+
+            // 获取硬盘信息
+            pclsObj->Get(L"Caption", 0, &vtProp, 0, 0);
+            VARIANT vtProp_id;
+            pclsObj->Get(L"SerialNumber", 0, &vtProp_id, 0, 0);
+
+            //添加硬盘信息
+            if (!(vtProp.vt == VT_EMPTY || vtProp.vt == VT_I4 ||
+                vtProp.vt == VT_DISPATCH)){
+                Disk *tempDisk=new Disk(w2s(vtProp_id.bstrVal));
+                diskList.append(*tempDisk);
+                delete tempDisk;
+                };
+
+            //确定硬盘对应分区
+            std::wstring wstrQuery = L"Associators of {Win32_DiskDrive.DeviceID='\\\\.\\";
+            wstrQuery += tmp;
+            wstrQuery += L"'} where AssocClass=Win32_DiskDriveToDiskPartition";
+
+            IEnumWbemClassObject* pEnumerator1 = NULL;
+            hres = pSvc->ExecQuery(
+                bstr_t("WQL"),
+                bstr_t(wstrQuery.c_str()),
+                WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
+                NULL,
+                &pEnumerator1);
+
+            if (FAILED(hres)) {
+                qDebug()<< "Query for processes failed. "
+                    << "Error code = 0x"
+                    << hex << hres << endl;
+                pSvc->Release();
+                pLoc->Release();
+                CoUninitialize();
+                return FALSE;
+            }
+            else {
+                IWbemClassObject* pclsObj1;
+                ULONG uReturn1 = 0;
+                while (pEnumerator1) {
+                    hres = pEnumerator1->Next(WBEM_INFINITE, 1,
+                        &pclsObj1, &uReturn1);
+                    if (0 == uReturn1) break;
+
+                    //获取硬盘索引
+                    VARIANT vtProp1;
+                    hres = pclsObj1->Get(_bstr_t(L"DeviceID"), 0, &vtProp1, 0, 0);
+
+                    std::wstring wstrQuery = L"Associators of {Win32_DiskPartition.DeviceID='";
+                    wstrQuery += vtProp1.bstrVal;
+                    wstrQuery += L"'} where AssocClass=Win32_LogicalDiskToPartition";
+
+                    IEnumWbemClassObject* pEnumerator2 = NULL;
+                    hres = pSvc->ExecQuery(
+                        bstr_t("WQL"),
+                        bstr_t(wstrQuery.c_str()),
+                        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
+                        NULL,
+                        &pEnumerator2);
+
+                    if (FAILED(hres)) {
+                        qDebug()<< "Query for processes failed. "
+                            << "Error code = 0x"
+                            << hex << hres << endl;
+                        pSvc->Release();
+                        pLoc->Release();
+                        CoUninitialize();
+                        return FALSE;
+                    }
+                    else {
+                        IWbemClassObject* pclsObj2;
+                        ULONG uReturn2 = 0;
+                        while (pEnumerator2) {
+                            hres = pEnumerator2->Next(WBEM_INFINITE, 1,
+                                &pclsObj2, &uReturn2);
+                            if (0 == uReturn2) break;
+
+                            // 获取分区信息
+                            VARIANT vtProp2;
+                            VARIANT vtProp2_size;
+                            VARIANT vtProp2_free;
+                            pclsObj2->Get(L"Size", 0, &vtProp2_size, 0, 0);
+                            pclsObj2->Get(L"FreeSpace", 0, &vtProp2_free, 0, 0);
+
+                            hres = pclsObj2->Get(_bstr_t(L"DeviceID"), 0, &vtProp2, 0, 0);
+
+                            // 添加分区信息
+                            diskList.last().addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
+
+                            VariantClear(&vtProp2);
+                            VariantClear(&vtProp2_size);
+                            VariantClear(&vtProp2_free);
+                        }
+                        pclsObj1->Release();
+                    }
+                    VariantClear(&vtProp1);
+                    pEnumerator2->Release();
+                }
+                pclsObj->Release();
+            }
+            VariantClear(&vtProp);
+            VariantClear(&vtProp_id);
+            pEnumerator1->Release();
+        }
+    }
+    pEnumerator->Release();
+    wmi_run();
+    return TRUE;
+}
+
+bool Monitor::UpdateDiskInf(QList<Disk> &diskList)
+{
+    while(diskList.length()>0) {
+        diskList.removeLast();}
+    SetDiskInf(diskList);
+}
+
+bool wmi_run()
+{
+    HRESULT hres;
+
+    hres = CoInitializeEx(0, COINIT_MULTITHREADED);
+    if (FAILED(hres))
+    {
+        qDebug() << "Failed to initialize COM library. Error code = 0x"
+            << hex << hres << endl;
+        return 1;
+    }
+
+    hres = CoInitializeSecurity(
+        NULL,
+        -1,
+        NULL,
+        NULL,
+        RPC_C_AUTHN_LEVEL_DEFAULT,
+        RPC_C_IMP_LEVEL_IMPERSONATE,
+        NULL,
+        EOAC_NONE,
+        NULL
+    );
+
+    if (FAILED(hres))
+    {
+        qDebug() << "Failed to initialize security. Error code = 0x"
+            << hex << hres << endl;
+        CoUninitialize();
+        return 1;
+    }
+
+    hres = CoCreateInstance(
+        CLSID_WbemLocator,
+        0,
+        CLSCTX_INPROC_SERVER,
+        IID_IWbemLocator, (LPVOID*)&pLoc);
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Failed to create IWbemLocator object."
+            << " Err code = 0x"
+            << hex << hres << endl;
+        CoUninitialize();
+        return 1;
+    }
+
+    hres = pLoc->ConnectServer(
+        _bstr_t(L"ROOT\\CIMV2"),
+        NULL,
+        NULL,
+        0,
+        NULL,
+        0,
+        0,
+        &pSvc
+    );
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Could not connect. Error code = 0x"
+            << hex << hres << endl;
+        pLoc->Release();
+        CoUninitialize();
+        return 1;
+    }
+
+    hres = CoSetProxyBlanket(
+        pSvc,
+        RPC_C_AUTHN_WINNT,
+        RPC_C_AUTHZ_NONE,
+        NULL,
+        RPC_C_AUTHN_LEVEL_CALL,
+        RPC_C_IMP_LEVEL_IMPERSONATE,
+        NULL,
+        EOAC_NONE
+    );
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Could not set proxy blanket. Error code = 0x"
+            << hex << hres << endl;
+        pSvc->Release();
+        pLoc->Release();
+        CoUninitialize();
+        return 1;
+    }
+    return 0;
+}
+
+bool wmi_close()
+{
+    pSvc->Release();
+    pLoc->Release();
+    CoUninitialize();
+
+    return 0;
+}
+
+float w2f(const wchar_t* pwstr)
+{
+    int nlength = wcslen(pwstr);
+    //获取转换后的长度
+    int nbytes = WideCharToMultiByte(0, 0, pwstr, nlength, NULL, 0, NULL, NULL);
+    char* pcstr = new char[nbytes + 1];
+    // 通过以上得到的结果，转换unicode 字符为ascii 字符
+    WideCharToMultiByte(0, 0, pwstr, nlength, pcstr, nbytes, NULL, NULL);
+    pcstr[nbytes] = '\0';
+    //ascii字符转浮点数
+    double number;
+    sscanf_s(pcstr, "%lf", &number);
+
+    return number;
+}
+
+QString w2s(const wchar_t* pwstr)
+{
+    QString q_str((QChar*)pwstr,wcslen(pwstr));
+    return QString::fromUtf16(q_str.utf16());
 }

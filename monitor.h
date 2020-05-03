@@ -4,6 +4,8 @@
 #include <Windows.h>
 #include <Pdh.h>
 #include <QString>
+#include <QList>
+#include <disk.h>
 
 class Monitor
 {
@@ -20,10 +22,13 @@ public:
     int Update();
 
 private:
-    int QueryCPUID(QString &CPUID);
+    bool QueryCPUID(QString &CPUID);
     bool QueryOSVersion(QString &OSVersion);
+    bool SetDiskInf(QList<Disk> &diskList);
+    bool UpdateDiskInf(QList<Disk> &diskList);
 
 private:
+    QList<Disk> diskList; //存放硬盘信息
     double m_dbTotalCPUUsage;
     double m_dbTotalMemoryUsage;
     double m_dbTotalDiskReadSpeed;

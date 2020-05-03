@@ -9,7 +9,7 @@ typedef struct DiskLabelInfo{
     QLabel* usageLabel;
     QLabel* percentLabel;
 } diskLabelInfo;
-class Disk : public QGridLayout
+class Disk :public QGridLayout
 {
     Q_OBJECT
 public:

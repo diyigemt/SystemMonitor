@@ -15,8 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusbar->setStyleSheet("color: rgb(255,0,0)");
     myMonitor = new Monitor();
     myTimer = new QTimer();
-    diskMap = new QMap<QString, Disk*>();
-    diskCount = 0;
     for (int i = 0; i < 4; i++)
     {
         QLabel* l = new QLabel();
@@ -24,12 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     }
     QObject::connect(myTimer, &QTimer::timeout, this, &MainWindow::update);
     startMonitor();
-    addDisk("123123123");
-    addPartition("123123123", "C:", 100.0f, 210.0f);
-    addPartition("123123123", "D:", 50.0f, 210.0f);
-    addDisk("31231231");
-    addPartition("31231231", "E:", 300.0f, 510.2f);
-    addPartition("31231231", "F:", 150.3f, 210.0f);
 }
 
 MainWindow::~MainWindow()
