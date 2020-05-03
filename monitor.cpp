@@ -5,7 +5,68 @@
 #include "constants.h"
 #include <QDebug>
 #include <WinUser.h>
-// #include <VersionHelpers.h>
+
+typedef struct _PEB {
+    BOOLEAN InheritedAddressSpace;
+    BOOLEAN ReadImageFileExecOptions;
+    BOOLEAN BeingDebugged;
+    BOOLEAN BitField;
+    HANDLE Mutant;
+    PVOID ImageBaseAddress;
+    PVOID Ldr;
+    PVOID ProcessParameters;
+    PVOID SubSystemData;
+    PVOID ProcessHeap;
+    PVOID FastPebLock;
+    PVOID AtlThunkSListPtr;
+    PVOID SparePtr2;
+    ULONG EnvironmentUpdateCount;
+    PVOID KernelCallbackTable;
+    ULONG SystemReserved[1];
+    ULONG SpareUlong;
+    PVOID FreeList;
+    ULONG TlsExpansionCounter;
+    PVOID TlsBitmap;
+    ULONG TlsBitmapBits[2];
+    PVOID ReadOnlySharedMemoryBase;
+    PVOID ReadOnlySharedMemoryHeap;
+    PVOID *ReadOnlyStaticServerData;
+    PVOID AnsiCodePageData;
+    PVOID OemCodePageData;
+    PVOID UnicodeCaseTableData;
+    ULONG NumberOfProcessors;
+    ULONG NtGlobalFlag;
+    LARGE_INTEGER CriticalSectionTimeout;
+    SIZE_T HeapSegmentReserve;
+    SIZE_T HeapSegmentCommit;
+    SIZE_T HeapDeCommitTotalFreeThreshold;
+    SIZE_T HeapDeCommitFreeBlockThreshold;
+    ULONG NumberOfHeaps;
+    ULONG MaximumNumberOfHeaps;
+    PVOID *ProcessHeaps;
+    PVOID GdiSharedHandleTable;
+    PVOID ProcessStarterHelper;
+    ULONG GdiDCAttributeList;
+    PVOID LoaderLock;
+    ULONG OSMajorVersion;
+    ULONG OSMinorVersion;
+    USHORT OSBuildNumber;
+    USHORT OSCSDVersion;
+    ULONG OSPlatformId;
+} PEB, *PPEB;
+
+typedef struct _TEB {
+    NT_TIB NtTib;
+    PVOID EnvironmentPointer;
+    struct {
+        HANDLE UniqueProcess;
+        HANDLE UniqueThread;
+    } ClientId;
+    PVOID ActiveRpcHandle;
+    PVOID ThreadLocalStoragePointer;
+    PEB *ProcessEnvironmentBlock;
+} TEB, *PTEB;
+
 
 /**
  * @brief Monitor::Monitor 无参构造函数，默认构建四个计数器
@@ -15,17 +76,11 @@ Monitor::Monitor()
     PDH_STATUS status = PdhOpenQuery(nullptr, 0, &this->m_hQuery);
     this->m_lpBuffer = new MEMORYSTATUSEX;
     this->m_lpBuffer->dwLength = sizeof (MEMORYSTATUSEX);
-//    if (status != ERROR_SUCCESS)
-//    {
-//        MessageBox(NULL, TEXT("初始化查询失败!"), TEXT(""), MB_OK);
-//    }
     // 添加各种Counter
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Processor Information(_Total)\\% Processor Utility"), NULL, &this->m_hTotalCPUCounter);
-//    status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\Working Set - Private"), NULL, &this->m_hTotalMemoryCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Read Bytes/sec"), NULL, &this->m_hTotalDiskReadCounter);
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Write Bytes/sec"), NULL, &this->m_hTotalDiskWriteCounter);
-    // qDebug() << "Get id:" << endl;
-    // this->m_sCPUID = this->QueryCPUID();
+    // 获取系统的版本
     this->QueryOSVersion(this->m_sOSVersion);
     qDebug() << this->m_sOSVersion << endl;
     this->Update(); // 初始化
@@ -38,7 +93,6 @@ Monitor::Monitor()
 Monitor::~Monitor()
 {
    PdhRemoveCounter(this->m_hTotalCPUCounter);
-//   PdhRemoveCounter(this->m_hTotalMemoryCounter);
    PdhRemoveCounter(this->m_hTotalDiskReadCounter);
    PdhRemoveCounter(this->m_hTotalDiskWriteCounter);
    PdhCloseQuery(this->m_hQuery);
@@ -117,8 +171,6 @@ int Monitor::Update()
     int result = 0;
     PDH_STATUS status;
     status = PdhCollectQueryData(this->m_hQuery);
-//    Sleep(1000);  // 睡眠一秒钟再次收集一次数据
-//    status = PdhCollectQueryData(this->m_hQuery);
     if (ERROR_SUCCESS != status)
     {
         result |= GET_DATA_FAILURE;
@@ -227,17 +279,28 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
     GetSystemInfo(&systeminfo);
 
     // 使用os获取操作系统的类型和版本
+    DWORD dwMajorVersion, dwMinorVersion;
+    TEB *lpTeb = NtCurrentTeb();
+    if (lpTeb != nullptr)
+    {
+        PEB *lpPeb = lpTeb->ProcessEnvironmentBlock;
+        if (lpPeb != nullptr)
+        {
+            dwMajorVersion = lpPeb->OSMajorVersion;
+            dwMinorVersion = lpPeb->OSMinorVersion;
+        }
+    }
     OSVERSIONINFOEX os;
     os.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
     bool unknown = false;
     if (GetVersionEx((OSVERSIONINFO *)&os))
     {
         // 判断主版本号
-        switch (os.dwMajorVersion)
+        switch (dwMajorVersion)
         {
         case 10:
             // 判断次版本号
-            switch (os.dwMinorVersion)
+            switch (dwMinorVersion)
             {
             case 0:
                 if (os.wProductType == VER_NT_WORKSTATION)
@@ -255,7 +318,7 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
             }
             break;
         case 6:
-            switch (os.dwMinorVersion)
+            switch (dwMinorVersion)
             {
             case 3:
                 if (os.wProductType == VER_NT_WORKSTATION)
@@ -303,7 +366,7 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
             }
             break;
         case 5:
-            switch (os.dwMinorVersion)
+            switch (dwMinorVersion)
             {
             case 2:
                 if (os.wSuiteMask & VER_SUITE_WH_SERVER)
@@ -344,8 +407,5 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
         OSVersion = "UNKNOWN";
         return false;
     }
-    // bool version = IsWindows8OrGreater();
-    // qDebug() << version << endl;
     return true;
-
 }
