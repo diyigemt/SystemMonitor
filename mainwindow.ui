@@ -17,8 +17,8 @@
    <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>380</y>
+      <x>600</x>
+      <y>480</y>
       <width>195</width>
       <height>61</height>
      </rect>
@@ -107,8 +107,8 @@
      <rect>
       <x>10</x>
       <y>170</y>
-      <width>371</width>
-      <height>131</height>
+      <width>781</width>
+      <height>81</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="StorageverticalLayout">
@@ -124,30 +124,6 @@
         <string>Storage:</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="StorageLayout">
-       <item>
-        <widget class="QLabel" name="StorageUsageLabe">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Disk Usage:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QProgressBar" name="StorageUsageprogressBar">
-         <property name="value">
-          <number>0</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
      <item>
       <layout class="QHBoxLayout" name="ReadAndWriteLayout">
@@ -243,91 +219,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_4">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>170</y>
-      <width>381</width>
-      <height>131</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="PartitionsverticalLayout">
-     <item>
-      <widget class="QLabel" name="PartitionsTitleLabel">
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Partitions:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="PartitionsLayout_1">
-       <item>
-        <widget class="QLabel" name="DiskCLabel">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>C:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="DiskDLabel">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>D:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="ReadAndWriteLayout_2">
-       <item>
-        <widget class="QLabel" name="DiskELabel">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>E:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="DiskFLabel">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>F:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
@@ -346,6 +237,17 @@
     <property name="text">
      <string>OS:</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>260</y>
+      <width>781</width>
+      <height>211</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="DiskLayout"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

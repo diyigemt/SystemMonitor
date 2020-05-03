@@ -125,7 +125,5 @@ void MainWindow::addDisk()
     a->setDiskId("1231213142343452");
     a->addPartition("C:", 100.1f, 200.2f);
     a->setPartition("C:", 50.2f, 100.0f);
-    QLabel* s = new QLabel("1231312");
     ui->DiskLayout->addLayout(a, 0, 0);
-    ui->DiskLayout->addWidget((QWidget*)s, 1, 1);
 }

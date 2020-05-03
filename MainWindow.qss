@@ -29,3 +29,15 @@ QProgressBar{
 QProgressBar:chunk{
     background-color: #76ff03
 }
+#MemoryTitleLabel{
+    border: none;
+}
+#CPUTitleLabel{
+    border: none;
+}
+#StorageTitleLabel{
+    border: none;
+}
+#StorageTitleLabel{
+    border: none;
+}
