@@ -106,7 +106,7 @@ void MainWindow::updateMemoryUsage()
 void MainWindow::updateSystemMemory()
 {
     int SystemMemory = (int)(this->myMonitor->GetSystemMemory()/1024/1024);
-    ui->TotalMemoryLabel->setText("System Memory:" + QString::number(SystemMemory) + "M");
+    ui->TotalMemoryLabel->setText("System Memory:" + QString::number(SystemMemory) + "MB");
 }
 void MainWindow::updateDiskReadAndWriteSpeed()
 {
