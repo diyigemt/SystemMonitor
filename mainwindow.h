@@ -27,10 +27,12 @@ private:
     void updateSystemMemory();
     void updateDiskReadAndWriteSpeed();
     void addDisk(QString id);
+    void addPartition(QString diskId, QString name, float usage, float total);
+    void setPartition(QString diskId, QString name, float usage, float total);
     Ui::MainWindow *ui;
     Monitor *myMonitor;
     QTimer *myTimer;
-    QMap<QString, QWidget*> *myMap;
+    QMap<QString, Disk*> *diskMap;
     int diskCount;
 
 };

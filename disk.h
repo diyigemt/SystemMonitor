@@ -21,7 +21,7 @@ public:
     void setPartition(QString name, float usage, float total);
     QString getDiskId();
 private:
-    int diskCount;
+    int partitionCount;
     QLabel* diskId;
     QMap<QString, diskLabelInfo*>* labelMap;
 };

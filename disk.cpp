@@ -5,15 +5,15 @@ Disk::Disk()
     diskId->setText("null");
     labelMap = new QMap<QString, diskLabelInfo*>();
     this->addWidget((QWidget*)diskId, 0, 0, 1, 3);
-    this->diskCount = 0;
+    this->partitionCount = 0;
 }
 
 Disk::Disk(QString id)
 {
-    diskId = new QLabel(id);
+    diskId = new QLabel("Disk Id:" + id);
     labelMap = new QMap<QString, diskLabelInfo*>();
     this->addWidget((QWidget*)diskId, 0, 0, 1, 3);
-    this->diskCount = 0;
+    this->partitionCount = 0;
 }
 
 Disk::~Disk()
@@ -34,19 +34,19 @@ void Disk::setDiskId(QString id)
  */
 void Disk::addPartition(QString name, float usage, float total)
 {
-    diskCount++;
+    partitionCount = partitionCount + 1;
     QString usageInfo = QString("%1").arg(usage) + "GB";
     QString totalInfo = QString("%1").arg(total) + "GB";
     QLabel* label = new QLabel(name);
     QLabel* usageLabel = new QLabel(usageInfo + "/" + totalInfo);
-    QLabel* percentLabel = new QLabel(QString::number((usage / total) * 100) + "%");
+    QLabel* percentLabel = new QLabel(QString::number((int)((usage / total) * 100)) + "%");
     DiskLabelInfo* labelInfo = (DiskLabelInfo*)malloc(sizeof (DiskLabelInfo));
     labelInfo->usageLabel = usageLabel;
     labelInfo->percentLabel = percentLabel;
     this->labelMap->insert(name, labelInfo);
-    this->addWidget((QWidget*)label, diskCount, 0, 1, 1);
-    this->addWidget((QWidget*)usageLabel, diskCount, 1, 1, 1);
-    this->addWidget((QWidget*)percentLabel, diskCount, 2, 1, 1);
+    this->addWidget((QWidget*)label, partitionCount, 0, 1, 1);
+    this->addWidget((QWidget*)usageLabel, partitionCount, 1, 1, 1);
+    this->addWidget((QWidget*)percentLabel, partitionCount, 2, 1, 1);
 }
 
 /**
@@ -60,10 +60,13 @@ void Disk::setPartition(QString name, float usage, float total)
     QString usageInfo = QString("%1").arg(usage) + "GB";
     QString totalInfo = QString("%1").arg(total) + "GB";
     DiskLabelInfo* labelInfo = this->labelMap->find(name).value();
-    QLabel* usageLabel = labelInfo->usageLabel;
-    QLabel* percentLabel = labelInfo->percentLabel;
-    usageLabel->setText(usageInfo + "/" + totalInfo);
-    percentLabel->setText(QString::number((usage / total) * 100) + "%");
+    if(labelInfo != nullptr)
+    {
+        QLabel* usageLabel = labelInfo->usageLabel;
+        QLabel* percentLabel = labelInfo->percentLabel;
+        usageLabel->setText(usageInfo + "/" + totalInfo);
+        percentLabel->setText(QString::number((int)((usage / total) * 100)) + "%");
+    }
 }
 
 /**

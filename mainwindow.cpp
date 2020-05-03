@@ -15,11 +15,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusbar->setStyleSheet("color: rgb(255,0,0)");
     myMonitor = new Monitor();
     myTimer = new QTimer();
-    myMap = new QMap<QString, QWidget*>();
+    diskMap = new QMap<QString, Disk*>();
     diskCount = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        QLabel* l = new QLabel();
+        ui->DiskLayout->addWidget(l, i / 2, i % 2);
+    }
     QObject::connect(myTimer, &QTimer::timeout, this, &MainWindow::update);
     startMonitor();
     addDisk("123123123");
+    addPartition("123123123", "C:", 100.0f, 210.0f);
+    addPartition("123123123", "D:", 50.0f, 210.0f);
+    addDisk("31231231");
+    addPartition("31231231", "E:", 300.0f, 510.2f);
+    addPartition("31231231", "F:", 150.3f, 210.0f);
 }
 
 MainWindow::~MainWindow()
@@ -89,7 +99,7 @@ void MainWindow::updateCPUUsage()
 void MainWindow::updateMemoryUsage()
 {
     int memoryUsage = this->myMonitor->GetMemoryUsage();
-    qDebug()<<memoryUsage<<endl;
+//    qDebug()<<memoryUsage<<endl;
     ui->MemoryUsageprogressBar->setValue(memoryUsage);
 }
 
@@ -126,12 +136,46 @@ void MainWindow::updateDiskReadAndWriteSpeed()
     ui->DiskWriteLabel->setText(s);
 }
 
+/**
+ * @brief MainWindow::addDisk 添加一个物理磁盘信息
+ * @param id 物理磁盘ID,用于更新和显示使用率，务必保持一致
+ */
 void MainWindow::addDisk(QString id)
 {
     Disk* disk = new Disk(id);
-    disk->addPartition("C:", 100.1f, 200.2f);
-    int row = diskCount / 2;
-    int column = diskCount - row;
-    ui->DiskLayout->addLayout(disk, row, column, 1, 1);
+    diskMap->insert(id, disk);
+    ui->DiskLayout->addLayout(disk, diskCount / 2, diskCount % 2, 1, 1);
     diskCount++;
+}
+
+/**
+ * @brief MainWindow::addPartition 给物理磁盘添加分卷
+ * @param diskId 磁盘ID,!!必须与创建磁盘时的ID保持一致!!
+ * @param name 分卷名,用于标识分卷及更新分卷信息
+ * @param usage 分卷当前使用空间
+ * @param total 分卷总可用空间
+ */
+void MainWindow::addPartition(QString diskId, QString name, float usage, float total)
+{
+    Disk* disk = diskMap->find(diskId).value();
+    if(disk != nullptr)
+    {
+        disk->addPartition(name, usage, total);
+    }
+}
+
+/**
+ * @brief MainWindow::setPartition 设置/更新分卷信息
+ * @param diskId 磁盘ID,!!必须与创建磁盘时的ID保持一致!!
+ * @param name 分卷名,!!必须与创建分卷时的名保持一致!!
+ * @param usage 分卷当前使用空间
+ * @param total 分卷总可用空间
+ */
+void MainWindow::setPartition(QString diskId, QString name, float usage, float total)
+{
+    Disk* disk = diskMap->find(diskId).value();
+    if(disk != nullptr)
+    {
+        disk->setPartition(name, usage, total);
+    }
 }
