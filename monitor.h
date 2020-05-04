@@ -6,7 +6,7 @@
 #include <QString>
 #include <QList>
 #include <disk.h>
-#include <mainwindow.h>
+#include <drive.h>
 
 class Monitor
 {
@@ -21,16 +21,18 @@ public:
     QString GetOSVersion();
     double GetSystemMemory();
     int Update();
+    int GetdiskCount();
+    QString GetDriveID(int driveIndex);
+    void getPartitonList(int driveIndex,QList<partition> *tempPartitonList);
 
 private:
     bool QueryCPUID(QString &CPUID);
     bool QueryOSVersion(QString &OSVersion);
-    bool SetDiskInf(int &diskCount,Disk &disk1,Disk &disk2);
+    bool SetDiskInf();
 
 private:
     int diskCount;
-    Disk disk1;
-    Disk disk2;
+    QList<drive> *driveList;
     double m_dbTotalCPUUsage;
     double m_dbTotalMemoryUsage;
     double m_dbTotalDiskReadSpeed;

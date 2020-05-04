@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     disk.cpp \
+    drive.cpp \
     main.cpp \
     mainwindow.cpp \
     monitor.cpp
@@ -24,6 +25,7 @@ SOURCES += \
 HEADERS += \
     constants.h \
     disk.h \
+    drive.h \
     mainwindow.h \
     monitor.h
 

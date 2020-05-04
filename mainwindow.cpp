@@ -16,20 +16,22 @@ MainWindow::MainWindow(QWidget *parent)
     myMonitor = new Monitor();
     myTimer = new QTimer();
     diskMap = new QMap<QString, Disk*>();
-    diskCount = 0;
-    for (int i = 0; i < 4; i++)
-    {
-        QLabel* l = new QLabel();
-        ui->DiskLayout->addWidget(l, i / 2, i % 2);
-    }
     QObject::connect(myTimer, &QTimer::timeout, this, &MainWindow::update);
     startMonitor();
-    addDisk("123123123");
-    addPartition("123123123", "C:", 100.0f, 210.0f);
-    addPartition("123123123", "D:", 50.0f, 210.0f);
-    addDisk("31231231");
-    addPartition("31231231", "E:", 300.0f, 510.2f);
-    addPartition("31231231", "F:", 150.3f, 210.0f);
+
+    int diskcount=myMonitor->GetdiskCount();
+    for (int i = 0; i < diskcount; i++)
+    {
+        addDisk(myMonitor->GetDriveID(i));
+        QList<partition> *partitionList=new QList<partition>();
+        myMonitor->getPartitonList(i,partitionList);
+        for(int j=0;j<=(*partitionList).length()-1;j++)
+        {
+            addPartition(myMonitor->GetDriveID(i),(*partitionList)[j].name,(*partitionList)[j].free,(*partitionList)[j].size);
+        }
+        delete partitionList;
+    }
+
 }
 
 MainWindow::~MainWindow()
@@ -76,7 +78,19 @@ void MainWindow::update()
     updateDiskReadAndWriteSpeed();
     updateSystemMemory();
 
-
+    //更新分卷
+//    int diskcount=this->myMonitor->GetdiskCount();
+//    for (int i = 0; i < diskcount; i++)
+//    {
+//        addDisk(this->myMonitor->GetDriveID(i));
+//        QList<partition> *partitionList=new QList<partition>();
+//        this->myMonitor->getPartitonList(i,partitionList);
+//        for(int j=0;j<=(*partitionList).length()-1;j++)
+//        {
+//            setPartition(this->myMonitor->GetDriveID(i),(*partitionList)[j].name,(*partitionList)[j].free,(*partitionList)[j].size);
+//        }
+//        delete partitionList;
+//    }
 }
 
 void MainWindow::resetAll()

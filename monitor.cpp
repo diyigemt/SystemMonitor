@@ -100,7 +100,9 @@ Monitor::Monitor()
     //获取cpuid
     QueryCPUID(m_sCPUID);
     //获取硬盘信息
-    this->SetDiskInf(this->diskCount,this->disk1,this->disk2);
+    this->driveList=new QList<drive>();
+    this->SetDiskInf();
+
     this->Update(); // 初始化
 }
 
@@ -241,7 +243,9 @@ int Monitor::Update()
     QueryCPUID(m_sCPUID);
 
     //清楚全部数据重新读取
-    SetDiskInf(diskCount,disk1,disk2);
+    delete driveList;
+    driveList=new QList<drive>();
+    SetDiskInf();
 
     return result;
 }
@@ -535,9 +539,8 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
  * @brief Monitor::SetDiskInf
  * @return QString 通过wmci指令添加硬盘和分区信息
  */
-bool Monitor::SetDiskInf(int &diskCount,Disk &disk1,Disk &disk2)
+bool Monitor::SetDiskInf()
 {
-    //diskcount=0
     diskCount=0;
 
     IWbemLocator* pLoc=NULL;
@@ -667,8 +670,9 @@ bool Monitor::SetDiskInf(int &diskCount,Disk &disk1,Disk &disk2)
             if (!(vtProp.vt == VT_EMPTY || vtProp.vt == VT_I4 ||
                 vtProp.vt == VT_DISPATCH)){             
                 diskCount++;
-                if(diskCount==1) disk1.setDiskId(w2s(vtProp_id.bstrVal));
-                if(diskCount==2) disk2.setDiskId(w2s(vtProp_id.bstrVal));
+                drive *tempDrive=new drive(w2s(vtProp_id.bstrVal));
+                (*driveList).append(*tempDrive);
+                delete tempDrive;
 
                   //test
                   qDebug()<<"origin:"<<w2s(vtProp_id.bstrVal);
@@ -740,6 +744,7 @@ bool Monitor::SetDiskInf(int &diskCount,Disk &disk1,Disk &disk2)
 
                             // 获取分区信息
                             VARIANT vtProp2;
+
                             VARIANT vtProp2_size;
                             VARIANT vtProp2_free;
                             pclsObj2->Get(L"Size", 0, &vtProp2_size, 0, 0);
@@ -748,10 +753,9 @@ bool Monitor::SetDiskInf(int &diskCount,Disk &disk1,Disk &disk2)
                             hres = pclsObj2->Get(_bstr_t(L"DeviceID"), 0, &vtProp2, 0, 0);
 
                             // 添加分区信息                       
-                            if(diskCount==1) disk1.addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
-                            if(diskCount==2) disk2.addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
+                            (*driveList).last().addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
 
-                              //test
+                             //test
                               qDebug()<<"diskcount:"<<diskCount;
                               qDebug()<<"origin1:"<<w2s(vtProp2.bstrVal);
                               qDebug()<<"origin2:"<<(w2f(vtProp2_free.bstrVal))/k2g;
@@ -780,6 +784,26 @@ bool Monitor::SetDiskInf(int &diskCount,Disk &disk1,Disk &disk2)
     CoUninitialize();
 
     return TRUE;
+}
+
+int Monitor::GetdiskCount()
+{
+    return diskCount;
+}
+
+QString Monitor::GetDriveID(int driveIndex)
+{
+    if(driveIndex<(*driveList).length())
+    return (*driveList)[driveIndex].getDriveID();
+}
+
+void Monitor::getPartitonList(int driveIndex,QList<partition> *tempPartitonList)
+{
+   QList<partition> *temp=new QList<partition>();
+   (*driveList)[driveIndex].getPartitonList(temp);
+   for(int i=0;i<=temp->length()-1;i++)
+   tempPartitonList->append(temp->at(i));
+   delete  temp;
 }
 
 float w2f(const wchar_t* pwstr)
