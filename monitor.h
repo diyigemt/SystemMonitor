@@ -6,6 +6,7 @@
 #include <QString>
 #include <QList>
 #include <disk.h>
+#include <mainwindow.h>
 
 class Monitor
 {
@@ -24,11 +25,12 @@ public:
 private:
     bool QueryCPUID(QString &CPUID);
     bool QueryOSVersion(QString &OSVersion);
-    bool SetDiskInf( QList<Disk> &diskList);
-    bool UpdateDiskInf( QList<Disk> &diskList);
+    bool SetDiskInf(int &diskCount,Disk &disk1,Disk &disk2);
 
 private:
-    QList<Disk> diskList; //存放硬盘信息
+    int diskCount;
+    Disk disk1;
+    Disk disk2;
     double m_dbTotalCPUUsage;
     double m_dbTotalMemoryUsage;
     double m_dbTotalDiskReadSpeed;

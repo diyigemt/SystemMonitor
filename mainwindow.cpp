@@ -67,6 +67,8 @@ void MainWindow::update()
     updateMemoryUsage();
     updateDiskReadAndWriteSpeed();
     updateSystemMemory();
+
+
 }
 
 void MainWindow::resetAll()

@@ -97,8 +97,10 @@ Monitor::Monitor()
     // 获取系统的版本
     this->QueryOSVersion(this->m_sOSVersion);
     qDebug() << this->m_sOSVersion << endl;
+    //获取cpuid
+    QueryCPUID(m_sCPUID);
     //获取硬盘信息
-    this->SetDiskInf(this->diskList);
+    this->SetDiskInf(this->diskCount,this->disk1,this->disk2);
     this->Update(); // 初始化
 }
 
@@ -235,9 +237,11 @@ int Monitor::Update()
         this->m_dbTotalDiskWriteSpeed = this->m_pdhCounterValue.doubleValue;
     }
 
-    //更新硬盘信息
+    //更新cpuid
+    QueryCPUID(m_sCPUID);
+
     //清楚全部数据重新读取
-    UpdateDiskInf(diskList);
+    SetDiskInf(diskCount,disk1,disk2);
 
     return result;
 }
@@ -253,6 +257,8 @@ bool Monitor::QueryCPUID(QString &CPUID)
 
     HRESULT hres;
 
+    //玄学
+    CoUninitialize();
     hres = CoInitializeEx(0, COINIT_MULTITHREADED);
     if (FAILED(hres))
     {
@@ -371,8 +377,8 @@ bool Monitor::QueryCPUID(QString &CPUID)
             {
                 CPUID = w2s(vtProp3_id.bstrVal);
                 //test
-                qDebug()<<"origin:"<<vtProp3_id.bstrVal;
-                qDebug()<<"cpuid:"<<CPUID;
+                qDebug()<<"origin:"<< w2s(vtProp3_id.bstrVal);
+                qDebug()<<"cpuid:"<< CPUID;
             }
         }
     }
@@ -529,8 +535,11 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
  * @brief Monitor::SetDiskInf
  * @return QString 通过wmci指令添加硬盘和分区信息
  */
-bool Monitor::SetDiskInf( QList<Disk> &diskList)
+bool Monitor::SetDiskInf(int &diskCount,Disk &disk1,Disk &disk2)
 {
+    //diskcount=0
+    diskCount=0;
+
     IWbemLocator* pLoc=NULL;
     IWbemServices* pSvc=NULL;
 
@@ -638,6 +647,7 @@ bool Monitor::SetDiskInf( QList<Disk> &diskList)
         IWbemClassObject* pclsObj;
         ULONG uReturn = 0;
         while (pEnumerator) {
+
             hres = pEnumerator->Next(WBEM_INFINITE, 1,
                 &pclsObj, &uReturn);
             if (0 == uReturn) break;
@@ -655,14 +665,14 @@ bool Monitor::SetDiskInf( QList<Disk> &diskList)
 
             //添加硬盘信息
             if (!(vtProp.vt == VT_EMPTY || vtProp.vt == VT_I4 ||
-                vtProp.vt == VT_DISPATCH)){
-                Disk *tempDisk=new Disk(w2s(vtProp_id.bstrVal));
-                diskList.append(*tempDisk);
-                delete tempDisk;
+                vtProp.vt == VT_DISPATCH)){             
+                diskCount++;
+                if(diskCount==1) disk1.setDiskId(w2s(vtProp_id.bstrVal));
+                if(diskCount==2) disk2.setDiskId(w2s(vtProp_id.bstrVal));
 
                   //test
                   qDebug()<<"origin:"<<w2s(vtProp_id.bstrVal);
-                  qDebug()<<"diskid:"<<diskList.last().getDiskId();
+                  qDebug()<<"diskcount:"<<diskCount;
                 };
 
             //确定硬盘对应分区
@@ -737,10 +747,12 @@ bool Monitor::SetDiskInf( QList<Disk> &diskList)
 
                             hres = pclsObj2->Get(_bstr_t(L"DeviceID"), 0, &vtProp2, 0, 0);
 
-                            // 添加分区信息
-                            diskList.last().addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
+                            // 添加分区信息                       
+                            if(diskCount==1) disk1.addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
+                            if(diskCount==2) disk2.addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
 
                               //test
+                              qDebug()<<"diskcount:"<<diskCount;
                               qDebug()<<"origin1:"<<w2s(vtProp2.bstrVal);
                               qDebug()<<"origin2:"<<(w2f(vtProp2_free.bstrVal))/k2g;
                               qDebug()<<"origin3:"<<(w2f(vtProp2_size.bstrVal))/k2g;
@@ -769,14 +781,6 @@ bool Monitor::SetDiskInf( QList<Disk> &diskList)
 
     return TRUE;
 }
-
-bool Monitor::UpdateDiskInf( QList<Disk> &diskList)
-{
-    while(diskList.length()>0) {
-        diskList.removeLast();}
-    return SetDiskInf(diskList);
-}
-
 
 float w2f(const wchar_t* pwstr)
 {
