@@ -24,8 +24,8 @@ public:
 private:
     bool QueryCPUID(QString &CPUID);
     bool QueryOSVersion(QString &OSVersion);
-    bool SetDiskInf(QList<Disk> &diskList);
-    bool UpdateDiskInf(QList<Disk> &diskList);
+    bool SetDiskInf( QList<Disk> &diskList);
+    bool UpdateDiskInf( QList<Disk> &diskList);
 
 private:
     QList<Disk> diskList; //存放硬盘信息

@@ -7,19 +7,12 @@
 #include <WinUser.h>
 
 //wmic相关定义
+#define k2g 1073741824 //byte to gb
 #define _WIN32_DCOM
 #include <comdef.h>
 #include <Wbemidl.h>
-
 #pragma comment(lib, "wbemuuid.lib")
-#define k2g 1073741824 //byte to gb
 
-IWbemLocator* pLoc = NULL;
-IWbemServices* pSvc = NULL;
-
-//wmic连接函数声明
-bool wmi_run();
-bool wmi_close();
 
 //宽字符转浮点数函数声明
 float w2f(const wchar_t* pwstr);
@@ -255,7 +248,89 @@ int Monitor::Update()
  */
 bool Monitor::QueryCPUID(QString &CPUID)
 {
+    IWbemLocator* pLoc=NULL;
+    IWbemServices* pSvc=NULL;
+
     HRESULT hres;
+
+    hres = CoInitializeEx(0, COINIT_MULTITHREADED);
+    if (FAILED(hres))
+    {
+        qDebug() << "Failed to initialize COM library. Error code = 0x"
+            << hex << hres << endl;
+    }
+
+    hres = CoInitializeSecurity(
+        NULL,
+        -1,
+        NULL,
+        NULL,
+        RPC_C_AUTHN_LEVEL_DEFAULT,
+        RPC_C_IMP_LEVEL_IMPERSONATE,
+        NULL,
+        EOAC_NONE,
+        NULL
+    );
+
+    if (FAILED(hres))
+    {
+        qDebug() << "Failed to initialize security. Error code = 0x"
+            << hex << hres << endl;
+        CoUninitialize();
+    }
+
+    hres = CoCreateInstance(
+        CLSID_WbemLocator,
+        0,
+        CLSCTX_INPROC_SERVER,
+        IID_IWbemLocator, (LPVOID*)&pLoc);
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Failed to create IWbemLocator object."
+            << " Err code = 0x"
+            << hex << hres << endl;
+        CoUninitialize();
+    }
+
+    hres = pLoc->ConnectServer(
+        _bstr_t(L"ROOT\\CIMV2"),
+        NULL,
+        NULL,
+        0,
+        NULL,
+        0,
+        0,
+        &pSvc
+    );
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Could not connect. Error code = 0x"
+            << hex << hres << endl;
+        pLoc->Release();
+        CoUninitialize();
+    }
+
+    hres = CoSetProxyBlanket(
+        pSvc,
+        RPC_C_AUTHN_WINNT,
+        RPC_C_AUTHZ_NONE,
+        NULL,
+        RPC_C_AUTHN_LEVEL_CALL,
+        RPC_C_IMP_LEVEL_IMPERSONATE,
+        NULL,
+        EOAC_NONE);
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Could not set proxy blanket. Error code = 0x"
+            << hex << hres << endl;
+        pSvc->Release();
+        pLoc->Release();
+        CoUninitialize();
+    }
+
     IEnumWbemClassObject* pEnumerator = NULL;
 
     hres = pSvc->ExecQuery(
@@ -295,10 +370,18 @@ bool Monitor::QueryCPUID(QString &CPUID)
                 vtProp3.vt == VT_DISPATCH))
             {
                 CPUID = w2s(vtProp3_id.bstrVal);
+                //test
+                qDebug()<<"origin:"<<vtProp3_id.bstrVal;
+                qDebug()<<"cpuid:"<<CPUID;
             }
         }
     }
     pEnumerator->Release();
+
+    pSvc->Release();
+    pLoc->Release();
+    CoUninitialize();
+
     return TRUE;
 }
 
@@ -446,11 +529,93 @@ bool Monitor::QueryOSVersion(QString &OSVersion)
  * @brief Monitor::SetDiskInf
  * @return QString 通过wmci指令添加硬盘和分区信息
  */
-bool Monitor::SetDiskInf(QList<Disk> &diskList)
+bool Monitor::SetDiskInf( QList<Disk> &diskList)
 {
-    wmi_run();
+    IWbemLocator* pLoc=NULL;
+    IWbemServices* pSvc=NULL;
 
     HRESULT hres;
+
+    //玄学
+    CoUninitialize();
+    hres = CoInitializeEx(0, COINIT_MULTITHREADED);
+    if (FAILED(hres))
+    {
+        qDebug() << "Failed to initialize COM library. Error code = 0x"
+            << hex << hres << endl;
+    }
+
+    hres = CoInitializeSecurity(
+        NULL,
+        -1,
+        NULL,
+        NULL,
+        RPC_C_AUTHN_LEVEL_DEFAULT,
+        RPC_C_IMP_LEVEL_IMPERSONATE,
+        NULL,
+        EOAC_NONE,
+        NULL
+    );
+
+    if (FAILED(hres))
+    {
+        qDebug() << "Failed to initialize security. Error code = 0x"
+            << hex << hres << endl;
+        CoUninitialize();
+    }
+
+    hres = CoCreateInstance(
+        CLSID_WbemLocator,
+        0,
+        CLSCTX_INPROC_SERVER,
+        IID_IWbemLocator, (LPVOID*)&pLoc);
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Failed to create IWbemLocator object."
+            << " Err code = 0x"
+            << hex << hres << endl;
+        CoUninitialize();
+    }
+
+    hres = pLoc->ConnectServer(
+        _bstr_t(L"ROOT\\CIMV2"),
+        NULL,
+        NULL,
+        0,
+        NULL,
+        0,
+        0,
+        &pSvc
+    );
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Could not connect. Error code = 0x"
+            << hex << hres << endl;
+        pLoc->Release();
+        CoUninitialize();
+    }
+
+    hres = CoSetProxyBlanket(
+        pSvc,
+        RPC_C_AUTHN_WINNT,
+        RPC_C_AUTHZ_NONE,
+        NULL,
+        RPC_C_AUTHN_LEVEL_CALL,
+        RPC_C_IMP_LEVEL_IMPERSONATE,
+        NULL,
+        EOAC_NONE);
+
+    if (FAILED(hres))
+    {
+        qDebug()<< "Could not set proxy blanket. Error code = 0x"
+            << hex << hres << endl;
+        pSvc->Release();
+        pLoc->Release();
+        CoUninitialize();
+    }
+
     IEnumWbemClassObject* pEnumerator = NULL;
 
     hres = pSvc->ExecQuery(
@@ -494,6 +659,10 @@ bool Monitor::SetDiskInf(QList<Disk> &diskList)
                 Disk *tempDisk=new Disk(w2s(vtProp_id.bstrVal));
                 diskList.append(*tempDisk);
                 delete tempDisk;
+
+                  //test
+                  qDebug()<<"origin:"<<w2s(vtProp_id.bstrVal);
+                  qDebug()<<"diskid:"<<diskList.last().getDiskId();
                 };
 
             //确定硬盘对应分区
@@ -546,7 +715,7 @@ bool Monitor::SetDiskInf(QList<Disk> &diskList)
                         qDebug()<< "Query for processes failed. "
                             << "Error code = 0x"
                             << hex << hres << endl;
-                        pSvc->Release();
+                       pSvc->Release();
                         pLoc->Release();
                         CoUninitialize();
                         return FALSE;
@@ -571,6 +740,11 @@ bool Monitor::SetDiskInf(QList<Disk> &diskList)
                             // 添加分区信息
                             diskList.last().addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
 
+                              //test
+                              qDebug()<<"origin1:"<<w2s(vtProp2.bstrVal);
+                              qDebug()<<"origin2:"<<(w2f(vtProp2_free.bstrVal))/k2g;
+                              qDebug()<<"origin3:"<<(w2f(vtProp2_size.bstrVal))/k2g;
+
                             VariantClear(&vtProp2);
                             VariantClear(&vtProp2_size);
                             VariantClear(&vtProp2_free);
@@ -588,115 +762,21 @@ bool Monitor::SetDiskInf(QList<Disk> &diskList)
         }
     }
     pEnumerator->Release();
-    wmi_run();
-    return TRUE;
-}
 
-bool Monitor::UpdateDiskInf(QList<Disk> &diskList)
-{
-    while(diskList.length()>0) {
-        diskList.removeLast();}
-    SetDiskInf(diskList);
-}
-
-bool wmi_run()
-{
-    HRESULT hres;
-
-    hres = CoInitializeEx(0, COINIT_MULTITHREADED);
-    if (FAILED(hres))
-    {
-        qDebug() << "Failed to initialize COM library. Error code = 0x"
-            << hex << hres << endl;
-        return 1;
-    }
-
-    hres = CoInitializeSecurity(
-        NULL,
-        -1,
-        NULL,
-        NULL,
-        RPC_C_AUTHN_LEVEL_DEFAULT,
-        RPC_C_IMP_LEVEL_IMPERSONATE,
-        NULL,
-        EOAC_NONE,
-        NULL
-    );
-
-    if (FAILED(hres))
-    {
-        qDebug() << "Failed to initialize security. Error code = 0x"
-            << hex << hres << endl;
-        CoUninitialize();
-        return 1;
-    }
-
-    hres = CoCreateInstance(
-        CLSID_WbemLocator,
-        0,
-        CLSCTX_INPROC_SERVER,
-        IID_IWbemLocator, (LPVOID*)&pLoc);
-
-    if (FAILED(hres))
-    {
-        qDebug()<< "Failed to create IWbemLocator object."
-            << " Err code = 0x"
-            << hex << hres << endl;
-        CoUninitialize();
-        return 1;
-    }
-
-    hres = pLoc->ConnectServer(
-        _bstr_t(L"ROOT\\CIMV2"),
-        NULL,
-        NULL,
-        0,
-        NULL,
-        0,
-        0,
-        &pSvc
-    );
-
-    if (FAILED(hres))
-    {
-        qDebug()<< "Could not connect. Error code = 0x"
-            << hex << hres << endl;
-        pLoc->Release();
-        CoUninitialize();
-        return 1;
-    }
-
-    hres = CoSetProxyBlanket(
-        pSvc,
-        RPC_C_AUTHN_WINNT,
-        RPC_C_AUTHZ_NONE,
-        NULL,
-        RPC_C_AUTHN_LEVEL_CALL,
-        RPC_C_IMP_LEVEL_IMPERSONATE,
-        NULL,
-        EOAC_NONE
-    );
-
-    if (FAILED(hres))
-    {
-        qDebug()<< "Could not set proxy blanket. Error code = 0x"
-            << hex << hres << endl;
-        pSvc->Release();
-        pLoc->Release();
-        CoUninitialize();
-        return 1;
-    }
-    return 0;
-}
-
-bool wmi_close()
-{
     pSvc->Release();
     pLoc->Release();
     CoUninitialize();
 
-    return 0;
+    return TRUE;
 }
+
+bool Monitor::UpdateDiskInf( QList<Disk> &diskList)
+{
+    while(diskList.length()>0) {
+        diskList.removeLast();}
+    return SetDiskInf(diskList);
+}
+
 
 float w2f(const wchar_t* pwstr)
 {
