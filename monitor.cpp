@@ -100,6 +100,7 @@ Monitor::Monitor()
     //获取cpuid
     QueryCPUID(m_sCPUID);
     //获取硬盘信息
+    querytime=0;
     this->driveList=new QList<drive>();
     this->SetDiskInf();
 
@@ -242,11 +243,14 @@ int Monitor::Update()
     //更新cpuid
     QueryCPUID(m_sCPUID);
 
+    //查询等待时间
+     querytime--;
     //清楚全部数据重新读取
+    if(querytime<=0){
     delete driveList;
     driveList=new QList<drive>();
     SetDiskInf();
-
+}
     return result;
 }
 
@@ -786,6 +790,8 @@ bool Monitor::SetDiskInf()
     pLoc->Release();
     CoUninitialize();
 
+    //
+    querytime=10;
     return TRUE;
 }
 
@@ -822,6 +828,7 @@ float w2f(const wchar_t* pwstr)
     double number;
     sscanf_s(pcstr, "%lf", &number);
 
+    delete[] pcstr;
     return number;
 }
 

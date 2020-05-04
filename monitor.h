@@ -31,6 +31,7 @@ private:
     bool SetDiskInf();
 
 private:
+    int querytime;
     int diskCount;
     QList<drive> *driveList;
     double m_dbTotalCPUUsage;
