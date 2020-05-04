@@ -16,11 +16,21 @@ MainWindow::MainWindow(QWidget *parent)
     myMonitor = new Monitor();
     myTimer = new QTimer();
     diskMap = new QMap<QString, Disk*>();
+    diskCount = 0;
     QObject::connect(myTimer, &QTimer::timeout, this, &MainWindow::update);
     startMonitor();
 
-    int diskcount=myMonitor->GetdiskCount();
-    for (int i = 0; i < diskcount; i++)
+    ui->CPUTypeLabel->setText("CPU Type:" + myMonitor->GetCPUID());
+    ui->OSTypeLable->setText("OS:" + myMonitor->GetOSVersion());
+
+    for(int i = 0; i < 4; i++)
+    {
+        QLabel* label = new QLabel();
+        ui->DiskLayout->addWidget(label, i / 2, i % 2, 1, 1);
+    }
+
+    int count=myMonitor->GetdiskCount();
+    for (int i = 0; i < count; i++)
     {
         addDisk(myMonitor->GetDriveID(i));
         QList<partition> *partitionList=new QList<partition>();
@@ -31,7 +41,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         delete partitionList;
     }
-
 }
 
 MainWindow::~MainWindow()
@@ -82,7 +91,6 @@ void MainWindow::update()
 //    int diskcount=this->myMonitor->GetdiskCount();
 //    for (int i = 0; i < diskcount; i++)
 //    {
-//        addDisk(this->myMonitor->GetDriveID(i));
 //        QList<partition> *partitionList=new QList<partition>();
 //        this->myMonitor->getPartitonList(i,partitionList);
 //        for(int j=0;j<=(*partitionList).length()-1;j++)
@@ -104,10 +112,8 @@ void MainWindow::resetAll()
 void MainWindow::updateCPUUsage()
 {
     int CPUUsage = this->myMonitor->GetCPUUsage();
-    if(CPUUsage == ui->CPUUsageprogressBar->value())
+    if(CPUUsage != ui->CPUUsageprogressBar->value())
     {
-
-    } else {
         ui->CPUUsageprogressBar->setValue(CPUUsage);
     }
 }

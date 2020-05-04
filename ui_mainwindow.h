@@ -37,7 +37,7 @@ public:
     QLabel *CPUTitleLabel;
     QLabel *CPUTypeLabel;
     QHBoxLayout *CPUUsageLayout;
-    QLabel *CUPUsageLabe;
+    QLabel *CUPUsageLabel;
     QProgressBar *CPUUsageprogressBar;
     QWidget *verticalLayoutWidget_2;
     QVBoxLayout *StorageverticalLayout;
@@ -52,7 +52,7 @@ public:
     QHBoxLayout *MemoryUsageLayout;
     QLabel *MemoryUsageLabe;
     QProgressBar *MemoryUsageprogressBar;
-    QLabel *label;
+    QLabel *OSTypeLable;
     QWidget *gridLayoutWidget_3;
     QGridLayout *DiskLayout;
     QMenuBar *menubar;
@@ -104,11 +104,11 @@ public:
 
         CPUUsageLayout = new QHBoxLayout();
         CPUUsageLayout->setObjectName(QString::fromUtf8("CPUUsageLayout"));
-        CUPUsageLabe = new QLabel(verticalLayoutWidget);
-        CUPUsageLabe->setObjectName(QString::fromUtf8("CUPUsageLabe"));
-        CUPUsageLabe->setFont(font);
+        CUPUsageLabel = new QLabel(verticalLayoutWidget);
+        CUPUsageLabel->setObjectName(QString::fromUtf8("CUPUsageLabel"));
+        CUPUsageLabel->setFont(font);
 
-        CPUUsageLayout->addWidget(CUPUsageLabe);
+        CPUUsageLayout->addWidget(CUPUsageLabel);
 
         CPUUsageprogressBar = new QProgressBar(verticalLayoutWidget);
         CPUUsageprogressBar->setObjectName(QString::fromUtf8("CPUUsageprogressBar"));
@@ -183,10 +183,15 @@ public:
 
         MemoryverticalLayout->addLayout(MemoryUsageLayout);
 
-        label = new QLabel(centralwidget);
-        label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(10, 10, 72, 15));
-        label->setFont(font);
+        OSTypeLable = new QLabel(centralwidget);
+        OSTypeLable->setObjectName(QString::fromUtf8("OSTypeLable"));
+        OSTypeLable->setGeometry(QRect(10, 10, 781, 16));
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(OSTypeLable->sizePolicy().hasHeightForWidth());
+        OSTypeLable->setSizePolicy(sizePolicy);
+        OSTypeLable->setFont(font);
         gridLayoutWidget_3 = new QWidget(centralwidget);
         gridLayoutWidget_3->setObjectName(QString::fromUtf8("gridLayoutWidget_3"));
         gridLayoutWidget_3->setGeometry(QRect(10, 260, 781, 211));
@@ -216,14 +221,14 @@ public:
         stopBtn->setText(QCoreApplication::translate("MainWindow", "\345\201\234\346\255\242\347\233\221\346\216\247", nullptr));
         CPUTitleLabel->setText(QCoreApplication::translate("MainWindow", "CPU Information:", nullptr));
         CPUTypeLabel->setText(QCoreApplication::translate("MainWindow", "CPU Type:", nullptr));
-        CUPUsageLabe->setText(QCoreApplication::translate("MainWindow", "CPU Usage:", nullptr));
+        CUPUsageLabel->setText(QCoreApplication::translate("MainWindow", "CPU Usage:", nullptr));
         StorageTitleLabel->setText(QCoreApplication::translate("MainWindow", "Storage:", nullptr));
         DiskReadLabel->setText(QCoreApplication::translate("MainWindow", "Read:", nullptr));
         DiskWriteLabel->setText(QCoreApplication::translate("MainWindow", "Write:", nullptr));
         MemoryTitleLabel->setText(QCoreApplication::translate("MainWindow", "Memory Information:", nullptr));
         TotalMemoryLabel->setText(QCoreApplication::translate("MainWindow", "System Memory:", nullptr));
         MemoryUsageLabe->setText(QCoreApplication::translate("MainWindow", "Memory Usage:", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "OS:", nullptr));
+        OSTypeLable->setText(QCoreApplication::translate("MainWindow", "OS:", nullptr));
     } // retranslateUi
 
 };

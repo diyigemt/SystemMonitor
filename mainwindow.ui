@@ -79,7 +79,7 @@
      <item>
       <layout class="QHBoxLayout" name="CPUUsageLayout">
        <item>
-        <widget class="QLabel" name="CUPUsageLabe">
+        <widget class="QLabel" name="CUPUsageLabel">
          <property name="font">
           <font>
            <family>Arial</family>
@@ -219,14 +219,20 @@
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="OSTypeLable">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>72</width>
-      <height>15</height>
+      <width>781</width>
+      <height>16</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <property name="font">
      <font>

@@ -96,7 +96,7 @@ Monitor::Monitor()
     status = PdhAddCounter(this->m_hQuery, TEXT("\\Process(_Total)\\IO Write Bytes/sec"), NULL, &this->m_hTotalDiskWriteCounter);
     // 获取系统的版本
     this->QueryOSVersion(this->m_sOSVersion);
-    qDebug() << this->m_sOSVersion << endl;
+    //qDebug() << this->m_sOSVersion << endl;
     //获取cpuid
     QueryCPUID(m_sCPUID);
     //获取硬盘信息
@@ -380,9 +380,10 @@ bool Monitor::QueryCPUID(QString &CPUID)
                 vtProp3.vt == VT_DISPATCH))
             {
                 CPUID = w2s(vtProp3_id.bstrVal);
-                //test
+                /*test
                 qDebug()<<"origin:"<< w2s(vtProp3_id.bstrVal);
                 qDebug()<<"cpuid:"<< CPUID;
+                */
             }
         }
     }
@@ -674,9 +675,10 @@ bool Monitor::SetDiskInf()
                 (*driveList).append(*tempDrive);
                 delete tempDrive;
 
-                  //test
+                  /*test
                   qDebug()<<"origin:"<<w2s(vtProp_id.bstrVal);
                   qDebug()<<"diskcount:"<<diskCount;
+                  */
                 };
 
             //确定硬盘对应分区
@@ -755,11 +757,12 @@ bool Monitor::SetDiskInf()
                             // 添加分区信息                       
                             (*driveList).last().addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
 
-                             //test
+                             /*test
                               qDebug()<<"diskcount:"<<diskCount;
                               qDebug()<<"origin1:"<<w2s(vtProp2.bstrVal);
                               qDebug()<<"origin2:"<<(w2f(vtProp2_free.bstrVal))/k2g;
                               qDebug()<<"origin3:"<<(w2f(vtProp2_size.bstrVal))/k2g;
+                              */
 
                             VariantClear(&vtProp2);
                             VariantClear(&vtProp2_size);
