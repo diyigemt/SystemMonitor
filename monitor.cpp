@@ -240,17 +240,17 @@ int Monitor::Update()
         this->m_dbTotalDiskWriteSpeed = this->m_pdhCounterValue.doubleValue;
     }
 
-    //更新cpuid
-    QueryCPUID(m_sCPUID);
-
     //查询等待时间
      querytime--;
-    //清楚全部数据重新读取
+    //清除全部数据重新读取
     if(querytime<=0){
     delete driveList;
     driveList=new QList<drive>();
     SetDiskInf();
-}
+    //更新cpuid
+    QueryCPUID(m_sCPUID);
+    }
+
     return result;
 }
 
@@ -367,30 +367,34 @@ bool Monitor::QueryCPUID(QString &CPUID)
         IWbemClassObject* pclsObj;
         ULONG uReturn = 0;
         while (pEnumerator) {
+
             hres = pEnumerator->Next(WBEM_INFINITE, 1,
                 &pclsObj, &uReturn);
             if (0 == uReturn) break;
 
-            VARIANT vtProp3;
-            hres = pclsObj->Get(_bstr_t(L"DeviceID"), 0, &vtProp3, 0, 0);
+            VARIANT vtProp;
+            hres = pclsObj->Get(_bstr_t(L"DeviceID"), 0, &vtProp, 0, 0);
 
-            std::wstring tmp = vtProp3.bstrVal;
+            std::wstring tmp = vtProp.bstrVal;
             tmp = tmp.substr(4);
 
-            VARIANT vtProp3_id;
-            pclsObj->Get(L"ProcessorId", 0, &vtProp3_id, 0, 0);
+            // 获取CPU信息
+            pclsObj->Get(L"Caption", 0, &vtProp, 0, 0);
+            VARIANT vtProp_id;
+            pclsObj->Get(L"ProcessorId", 0, &vtProp_id, 0, 0);
 
-            if (!(vtProp3.vt == VT_EMPTY || vtProp3.vt == VT_I4 ||
-                vtProp3.vt == VT_DISPATCH))
-            {
-                CPUID = w2s(vtProp3_id.bstrVal);
-                /*test
-                qDebug()<<"origin:"<< w2s(vtProp3_id.bstrVal);
-                qDebug()<<"cpuid:"<< CPUID;
-                */
-            }
+            //添加CPU信息
+            if (!(vtProp.vt == VT_EMPTY || vtProp.vt == VT_I4 ||
+                vtProp.vt == VT_DISPATCH)){
+                 CPUID = w2s(vtProp_id.bstrVal);
+                };
+
+            VariantClear(&vtProp);
+            VariantClear(&vtProp_id);
         }
+        pclsObj->Release();
     }
+
     pEnumerator->Release();
 
     pSvc->Release();
@@ -398,6 +402,7 @@ bool Monitor::QueryCPUID(QString &CPUID)
     CoUninitialize();
 
     return TRUE;
+
 }
 
 bool Monitor::QueryOSVersion(QString &OSVersion)
@@ -673,7 +678,7 @@ bool Monitor::SetDiskInf()
 
             //添加硬盘信息
             if (!(vtProp.vt == VT_EMPTY || vtProp.vt == VT_I4 ||
-                vtProp.vt == VT_DISPATCH)){             
+                vtProp.vt == VT_DISPATCH)){
                 diskCount++;
                 drive *tempDrive=new drive(w2s(vtProp_id.bstrVal));
                 (*driveList).append(*tempDrive);
@@ -758,7 +763,7 @@ bool Monitor::SetDiskInf()
 
                             hres = pclsObj2->Get(_bstr_t(L"DeviceID"), 0, &vtProp2, 0, 0);
 
-                            // 添加分区信息                       
+                            // 添加分区信息
                             (*driveList).last().addPartition(w2s(vtProp2.bstrVal),(w2f(vtProp2_free.bstrVal))/k2g,w2f(vtProp2_size.bstrVal)/k2g);
 
                              /*test
