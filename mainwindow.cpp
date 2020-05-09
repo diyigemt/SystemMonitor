@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowFlags(windowFlags());
+    this->setFixedSize(800, 600);
     ui->statusbar->setStyleSheet("color: rgb(255,0,0)");
     myMonitor = new Monitor();
     myTimer = new QTimer();
